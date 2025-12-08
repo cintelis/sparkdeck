@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Waitlist Manager | Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        :root {
+            --primary: #3a86ff;
+            --primary-dark: #2667cc;
+            --secondary: #8338ec;
+            --success: #06d6a0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border: #dee2e6;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .logo i {
+            color: var(--secondary);
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--gray);
+            margin-left: 25px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: var(--primary);
+        }
+        
+        /* Hero Section */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+            align-items: center;
+        }
+        
+        .hero-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+            line-height: 1.2;
+        }
+        
+        .hero-content p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin-bottom: 25px;
+        }
+        
+        .use-case-tags {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            background-color: var(--light-gray);
+            padding: 6px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .tag.restaurant {
+            background-color: #fff0f6;
+            color: #c2255c;
+        }
+        
+        .tag.event {
+            background-color: #fff4e6;
+            color: #e67700;
+        }
+        
+        .tag.launch {
+            background-color: #e6fcf5;
+            color: #0ca678;
+        }
+        
+        /* Waitlist Form */
+        .waitlist-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+        }
+        
+        .waitlist-card h2 {
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: #05b686;
+        }
+        
+        .notification-toggle {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            margin-right: 10px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .confirmation {
+            background-color: #e6fcf5;
+            border: 1px solid #96f2d7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .confirmation.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Dashboard Preview */
+        .dashboard-preview {
+            margin-top: 50px;
+        }
+        
+        .dashboard-preview h2 {
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            overflow: auto;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background-color: var(--light-gray);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--border);
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .status {
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status.confirmed {
+            background-color: #d3f9d8;
+            color: #2b8a3e;
+        }
+        
+        .status.waiting {
+            background-color: #fff3bf;
+            color: #e67700;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .action-btn:hover {
+            text-decoration: underline;
+        }
+        
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .feature-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px 0;
+            color: var(--gray);
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav a {
+                margin: 0 10px;
+            }
+            
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-list-ol"></i>
+                <span>WaitlistPro</span>
+            </div>
+            <nav>
+                <a href="#" class="active">Home</a>
+                <a href="#">Features</a>
+                <a href="#">Pricing</a>
+                <a href="#">Dashboard <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i></a>
+            </nav>
+        </header>
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Seamless Waitlist Management for Your Event, Launch, or Restaurant</h1>
+                <p>Reduce no-shows, manage capacity, and keep your customers informed with automated updates. Join thousands of businesses using our smart waitlist system.</p>
+                
+                <div class="use-case-tags">
+                    <div class="tag restaurant"><i class="fas fa-utensils"></i> Restaurants</div>
+                    <div class="tag event"><i class="fas fa-calendar-alt"></i> Events & Conferences</div>
+                    <div class="tag launch"><i class="fas fa-rocket"></i> Product Launches</div>
+                </div>
+                
+                <div class="stats" style="grid-template-columns: repeat(3, 1fr); max-width: 400px;">
+                    <div class="stat-card">
+                        <span class="stat-number">2,450+</span>
+                        <span class="stat-label">Businesses</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">1.2M+</span>
+                        <span class="stat-label">Sign-ups</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">98%</span>
+                        <span class="stat-label">Satisfaction</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Waitlist Signup Form -->
+            <div class="waitlist-card">
+                <h2>Join the Waitlist</h2>
+                <form id="waitlistForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" placeholder="John Smith" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="john@example.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="waitlistType">Waitlist For</label>
+                        <select id="waitlistType" required>
+                            <option value="" disabled selected>Select an option</option>
+                            <option value="product-launch">🚀 Product Launch (NextWeek App)</option>
+                            <option value="restaurant">🍽️ Restaurant Reservation (Bistro 42)</option>
+                            <option value="event">🎤 Tech Conference 2024</option>
+                            <option value="beta">🔧 Beta Access (FlowDesign Tool)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partySize">Party Size (for restaurants)</label>
+                        <select id="partySize">
+                            <option value="1">1 person</option>
+                            <option value="2" selected>2 people</option>
+                            <option value="3">3 people</option>
+                            <option value="4">4 people</option>
+                            <option value="5+">5+ people</option>
+                        </select>
+                    </div>
+                    
+                    <div class="notification-toggle">
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="notificationToggle" checked>
+                            <span class="slider"></span>
+                        </div>
+                        <label for="notificationToggle">Send me SMS updates about my position</label>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Join Waitlist
+                    </button>
+                </form>
+                
+                <!-- Confirmation Message -->
+                <div id="confirmation" class="confirmation">
+                    <h3><i class="fas fa-check-circle" style="color: var(--success);"></i> You're on the list!</h3>
+                    <p>We've sent a confirmation to <strong id="userEmail"></strong>. You're position #<strong id="positionNumber">42</strong> for <strong id="selectedWaitlist"></strong>.</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">We'll notify you when it's your turn (approx. <strong>3-5 days</strong>).</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Admin Dashboard Preview -->
+        <section class="dashboard-preview">
+            <h2><i class="fas fa-tachometer-alt"></i> Dashboard Preview</h2>
+            <p style="color: var(--gray); margin-bottom: 20px;">Manage all your waitlists from one simple dashboard.</p>
+            
+            <div class="dashboard-card">
+                <div class="dashboard-header">
+                    <h3>Active Waitlists</h3>
+                    <div>
+                        <button class="btn" style="width: auto; padding: 10px 20px; font-size: 0.9rem;">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalSignups">124</span>
+                        <span class="stat-label">Total Sign-ups</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="confirmedCount">89</span>
+                        <span class="stat-label">Confirmed</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="notifiedCount">22</span>
+                        <span class="stat-label">Notified</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="waitingCount">13</span>
+                        <span class="stat-label">Waiting</span>
+                    </div>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Waitlist</th>
+                            <th>Sign-up Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="waitlistTable">
+                        <!-- Table rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="features">
+            <div class="feature-card">
+                <i class="fas fa-robot"></i>
+                <h3>Automated Updates</h3>
+                <p>Send customized notifications via email or SMS when a spot opens up or status changes.</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Real-time Analytics</h3>
+                <p>Track conversion rates, no-shows, and customer engagement with detailed dashboards.</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-sync-alt"></i>
+                <h3>Calendar Integration</h3>
+                <p>Sync with Google Calendar or Outlook to automatically schedule confirmed spots.</p>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer>
+            <p>Smart Waitlist Manager Demo | This is a functional UI example for the SaaS product concept</p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">Use the form above to simulate adding yourself to a waitlist. Data is stored locally in your browser.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Sample data for initial dashboard
+        const initialWaitlistData = [
+            { id: 1, name: "Alex Johnson", email: "alex@example.com", waitlist: "Product Launch", date: "2024-05-10", status: "confirmed", partySize: 1 },
+            { id: 2, name: "Sam Davis", email: "sam@davis.co", waitlist: "Restaurant", date: "2024-05-09", status: "waiting", partySize: 2 },
+            { id: 3, name: "Taylor Morgan", email: "taylor@startup.io", waitlist: "Tech Conference", date: "2024-05-09", status: "confirmed", partySize: 1 },
+            { id: 4, name: "Jordan Lee", email: "jlee@company.com", waitlist: "Beta Access", date: "2024-05-08", status: "notified", partySize: 1 },
+            { id: 5, name: "Casey Smith", email: "casey.smith@email.com", waitlist: "Restaurant", date: "2024-05-08", status: "waiting", partySize: 4 }
+        ];
+        
+        // Initialize the dashboard table
+        function renderWaitlistTable() {
+            const tableBody = document.getElementById('waitlistTable');
+            tableBody.innerHTML = '';
+            
+            // Load data from localStorage or use initial data
+            let waitlistData = JSON.parse(localStorage.getItem('waitlistData')) || initialWaitlistData;
+            
+            // Update statistics
+            updateStatistics(waitlistData);
+            
+            // Render each row
+            waitlistData.forEach(person => {
+                const row = document.createElement('tr');
+                
+                // Format date for display
+                const dateObj = new Date(person.date);
+                const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                // Status badge
+                let statusClass = 'waiting';
+                let statusText = 'Waiting';
+                
+                if (person.status === 'confirmed') {
+                    statusClass = 'confirmed';
+                    statusText = 'Confirmed';
+                } else if (person.status === 'notified') {
+                    statusText = 'Notified';
+                }
+                
+                row.innerHTML = `
+                    <td><strong>${person.name}</strong></td>
+                    <td>${person.email}</td>
+                    <td>${person.waitlist}</td>
+                    <td>${formattedDate}</td>
+                    <td><span class="status ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="action-btn" onclick="notifyUser(${person.id})" title="Send Notification">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <button class="action-btn" onclick="confirmUser(${person.id})" title="Confirm Spot">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <button class="action-btn" onclick="removeUser(${person.id})" title="Remove">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('waitlistData', JSON.stringify(waitlistData));
+        }
+        
+        // Update dashboard statistics
+        function updateStatistics(data) {
+            const total = data.length;
+            const confirmed = data.filter(p => p.status === 'confirmed').length;
+            const notified = data.filter(p => p.status === 'notified').length;
+            const waiting = data.filter(p => p.status === 'waiting').length;
+            
+            document.getElementById('totalSignups').textContent = total;
+            document.getElementById('confirmedCount').textContent = confirmed;
+            document.getElementById('notifiedCount').textContent = notified;
+            document.getElementById('waitingCount').textContent = waiting;
+        }
+        
+        // Handle form submission
+        document.getElementById('waitlistForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const waitlistType = document.getElementById('waitlistType').value;
+            const partySize = document.getElementById('partySize').value;
+            const notifications = document.getElementById('notificationToggle').checked;
+            
+            // Determine waitlist display name
+            const waitlistOptions = {
+                'product-launch': 'Product Launch (NextWeek App)',
+                'restaurant': 'Restaurant Reservation (Bistro 42)',
+                'event': 'Tech Conference 2024',
+                'beta': 'Beta Access (FlowDesign Tool)'
+            };
+            
+            const waitlistName = waitlistOptions[waitlistType] || waitlistType;
+            
+            // Generate random position number
+            const position = Math.floor(Math.random() * 50) + 1;
+            
+            // Show confirmation message
+            document.getElementById('userEmail').textContent = email;
+            document.getElementById('positionNumber').textContent = position;
+            document.getElementById('selectedWaitlist').textContent = waitlistName;
+            
+            const confirmation = document.getElementById('confirmation');
+            confirmation.classList.add('show');
+            
+            // Add to waitlist data
+            const newEntry = {
+                id: Date.now(), // Simple unique ID
+                name: name,
+                email: email,
+                waitlist: waitlistName,
+                date: new Date().toISOString().split('T')[0],
+                status: 'waiting',
+                partySize: partySize
+            };
+            
+            let waitlistData = JSON.parse(localStorage.getItem('waitlistData')) || initialWaitlistData;
+            waitlistData.unshift(newEntry); // Add to beginning
+            localStorage.setItem('waitlistData', JSON.stringify(waitlistData));
+            
+            // Update the table
+            renderWaitlistTable();
+            
+            // Reset form
+            document.getElementById('waitlistForm').reset();
+            
+            // Change button to success state briefly
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Added!';
+            submitBtn.classList.add('btn-success');
+            
+            setTimeout(() => {
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Join Waitlist';
+                submitBtn.classList.remove('btn-success');
+            }, 2000);
+        });
+        
+        // Admin dashboard actions
+        function notifyUser(id) {
+            let waitlistData = JSON.parse(localStorage.getItem('waitlistData')) || initialWaitlistData;
+            const personIndex = waitlistData.findIndex(p => p.id === id);
+            
+            if (personIndex !== -1) {
+                waitlistData[personIndex].status = 'notified';
+                localStorage.setItem('waitlistData', JSON.stringify(waitlistData));
+                renderWaitlistTable();
+                
+                alert(`Notification sent to ${waitlistData[personIndex].name}`);
+            }
+        }
+        
+        function confirmUser(id) {
+            let waitlistData = JSON.parse(localStorage.getItem('waitlistData')) || initialWaitlistData;
+            const personIndex = waitlistData.findIndex(p => p.id === id);
+            
+            if (personIndex !== -1) {
+                waitlistData[personIndex].status = 'confirmed';
+                localStorage.setItem('waitlistData', JSON.stringify(waitlistData));
+                renderWaitlistTable();
+                
+                alert(`${waitlistData[personIndex].name} has been confirmed.`);
+            }
+        }
+        
+        function removeUser(id) {
+            if (confirm('Are you sure you want to remove this person from the waitlist?')) {
+                let waitlistData = JSON.parse(localStorage.getItem('waitlistData')) || initialWaitlistData;
+                waitlistData = waitlistData.filter(p => p.id !== id);
+                localStorage.setItem('waitlistData', JSON.stringify(waitlistData));
+                renderWaitlistTable();
+            }
+        }
+        
+        // Initialize the dashboard on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            renderWaitlistTable();
+            
+            // Example of updating waitlist type display
+            const waitlistTypeSelect = document.getElementById('waitlistType');
+            const partySizeGroup = document.getElementById('partySize').parentElement;
+            
+            waitlistTypeSelect.addEventListener('change', function() {
+                // Show/hide party size based on selection
+                if (this.value === 'restaurant') {
+                    partySizeGroup.style.display = 'block';
+                } else {
+                    partySizeGroup.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

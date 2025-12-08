@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-to-Code Assistant Demo | SparkDeck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --border: #cbd5e1;
+            --card-bg: #ffffff;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-code: 'Fira Code', 'Courier New', monospace;
+            
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+        
+        /* Header */
+        .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg) 0;
+            margin-bottom: var(--spacing-xl);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .demo-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .demo-logo i {
+            color: var(--accent);
+        }
+        
+        .demo-badge {
+            background: var(--primary);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-md);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--primary);
+        }
+        
+        /* Hero Section */
+        .demo-hero {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+            padding: var(--spacing-xl);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .demo-title {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-md);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        
+        .demo-subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto var(--spacing-xl);
+        }
+        
+        .demo-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+        }
+        
+        .feature-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        /* Main Content */
+        .demo-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        @media (max-width: 1024px) {
+            .demo-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Input Section */
+        .input-section, .output-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-lg);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .section-title i {
+            color: var(--primary);
+        }
+        
+        /* Voice Interface */
+        .voice-interface {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .voice-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .voice-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .voice-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.4);
+        }
+        
+        .voice-button.listening {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        .voice-status {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #94a3b8;
+            min-height: 1.5rem;
+        }
+        
+        .voice-status.active {
+            color: var(--secondary);
+        }
+        
+        /* Language Selection */
+        .language-selector {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .language-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .language-tab {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-full);
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .language-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .language-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Example Prompts */
+        .example-prompts {
+            margin-top: var(--spacing-lg);
+        }
+        
+        .prompt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+        }
+        
+        .prompt-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .prompt-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .prompt-icon {
+            color: var(--primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .prompt-text {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+        
+        /* Code Output */
+        .code-output {
+            background: var(--code-bg);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: var(--spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .code-header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .code-language {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .code-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .code-body {
+            padding: var(--spacing-lg);
+            font-family: var(--font-code);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        pre[class*="language-"] {
+            margin: 0;
+            background: transparent;
+            padding: 0;
+        }
+        
+        /* Code Analysis */
+        .analysis-results {
+            margin-top: var(--spacing-lg);
+        }
+        
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .analysis-title {
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .analysis-score {
+            background: var(--secondary);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-weight: 600;
+        }
+        
+        .analysis-description {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-md);
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .metric-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        
+        /* IDE Integration */
+        .ide-integration {
+            margin-top: var(--spacing-lg);
+        }
+        
+        .ide-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+        
+        .ide-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-full);
+            padding: var(--spacing-sm) var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .ide-badge i {
+            color: var(--primary);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-xl);
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .btn-success {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #0da271;
+            transform: translateY(-2px);
+        }
+        
+        .btn-small {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: 0.9rem;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+        
+        /* Footer */
+        .demo-footer {
+            text-align: center;
+            padding: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+        }
+        
+        .demo-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .demo-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: var(--spacing-md);
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Wave Animation */
+        .wave-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 40px;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .wave {
+            width: 4px;
+            height: 20px;
+            background: var(--primary);
+            margin: 0 2px;
+            border-radius: 4px;
+            animation: wave 1.2s infinite ease-in-out;
+        }
+        
+        .wave:nth-child(2) {
+            animation-delay: -1.1s;
+        }
+        
+        .wave:nth-child(3) {
+            animation-delay: -1.0s;
+        }
+        
+        .wave:nth-child(4) {
+            animation-delay: -0.9s;
+        }
+        
+        .wave:nth-child(5) {
+            animation-delay: -0.8s;
+        }
+        
+        @keyframes wave {
+            0%, 40%, 100% {
+                transform: scaleY(0.4);
+            }
+            20% {
+                transform: scaleY(1);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .demo-container {
+                padding: var(--spacing-md);
+            }
+            
+            .demo-title {
+                font-size: 2rem;
+            }
+            
+            .demo-hero {
+                padding: var(--spacing-lg);
+            }
+            
+            .demo-content {
+                gap: var(--spacing-lg);
+            }
+            
+            .input-section, .output-section {
+                padding: var(--spacing-lg);
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .prompt-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <header class="demo-header">
+            <div class="demo-logo">
+                <i class="fas fa-microphone-alt"></i>
+                <span>Voice-to-Code Assistant</span>
+            </div>
+            <div class="demo-badge">
+                SparkDeck Demo
+            </div>
+        </header>
+        
+        <!-- Hero Section -->
+        <section class="demo-hero">
+            <h1 class="demo-title">Convert Speech to Production Code</h1>
+            <p class="demo-subtitle">Describe features in plain English, get clean, production-ready code in multiple programming languages.</p>
+            
+            <div class="demo-features">
+                <div class="feature-card">
+                    <i class="fas fa-language"></i>
+                    <h3>Multi-Language Support</h3>
+                    <p>Generate code in JavaScript, Python, Java, C++, and more</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Code Quality Analysis</h3>
+                    <p>Automated code review and optimization suggestions</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-plug"></i>
+                    <h3>IDE Integration</h3>
+                    <p>VS Code, IntelliJ, Sublime Text, and more</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-brain"></i>
+                    <h3>Learning Algorithms</h3>
+                    <p>Improves based on your coding style and preferences</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Main Content -->
+        <div class="demo-content">
+            <!-- Input Section -->
+            <div class="input-section">
+                <h2 class="section-title">
+                    <i class="fas fa-microphone"></i>
+                    Describe Your Feature
+                </h2>
+                
+                <div class="voice-interface">
+                    <div class="voice-controls">
+                        <button class="voice-button" id="voiceButton">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        
+                        <div class="wave-container" id="waveContainer" style="display: none;">
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                        </div>
+                        
+                        <div class="voice-status" id="voiceStatus">
+                            Click the microphone to start speaking
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Or Type Your Description</label>
+                        <textarea id="textInput" placeholder="Describe the code you want to generate...">Create a React component that fetches user data from an API and displays it in a table with sorting and pagination. The component should handle loading and error states.</textarea>
+                    </div>
+                </div>
+                
+                <div class="language-selector">
+                    <h3 class="section-title">
+                        <i class="fas fa-code"></i>
+                        Select Language
+                    </h3>
+                    
+                    <div class="language-tabs" id="languageTabs">
+                        <div class="language-tab active" data-language="javascript">JavaScript/React</div>
+                        <div class="language-tab" data-language="python">Python</div>
+                        <div class="language-tab" data-language="java">Java</div>
+                        <div class="language-tab" data-language="cpp">C++</div>
+                        <div class="language-tab" data-language="typescript">TypeScript</div>
+                    </div>
+                </div>
+                
+                <div class="example-prompts">
+                    <h3 class="section-title">
+                        <i class="fas fa-lightbulb"></i>
+                        Try Example Prompts
+                    </h3>
+                    
+                    <div class="prompt-grid">
+                        <div class="prompt-card" data-prompt="Create a function that validates an email address">
+                            <div class="prompt-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <p class="prompt-text">Email validation function</p>
+                        </div>
+                        
+                        <div class="prompt-card" data-prompt="Build a REST API endpoint for user authentication with JWT tokens">
+                            <div class="prompt-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <p class="prompt-text">JWT authentication API</p>
+                        </div>
+                        
+                        <div class="prompt-card" data-prompt="Create a responsive navbar with dropdown menus and mobile hamburger menu">
+                            <div class="prompt-icon">
+                                <i class="fas fa-bars"></i>
+                            </div>
+                            <p class="prompt-text">Responsive navbar component</p>
+                        </div>
+                        
+                        <div class="prompt-card" data-prompt="Write a function to sort an array using quick sort algorithm">
+                            <div class="prompt-icon">
+                                <i class="fas fa-sort-amount-down"></i>
+                            </div>
+                            <p class="prompt-text">Quick sort implementation</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" id="generateBtn">
+                        <i class="fas fa-magic"></i>
+                        Generate Code
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn">
+                        <i class="fas fa-eraser"></i>
+                        Clear
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Output Section -->
+            <div class="output-section">
+                <h2 class="section-title">
+                    <i class="fas fa-code"></i>
+                    Generated Code
+                </h2>
+                
+                <div class="code-output">
+                    <div class="code-header">
+                        <div class="code-language">
+                            <i class="fab fa-js"></i>
+                            <span id="currentLanguage">JavaScript</span>
+                        </div>
+                        <div class="code-actions">
+                            <button class="btn btn-small btn-secondary" id="copyBtn">
+                                <i class="far fa-copy"></i>
+                                Copy
+                            </button>
+                            <button class="btn btn-small btn-secondary" id="formatBtn">
+                                <i class="fas fa-indent"></i>
+                                Format
+                            </button>
+                        </div>
+                    </div>
+                    <div class="code-body">
+                        <pre id="codeOutput"><code class="language-javascript">// Describe a feature to generate code
+// Click "Generate Code" or try an example prompt</code></pre>
+                    </div>
+                </div>
+                
+                <div class="analysis-results">
+                    <div class="analysis-card">
+                        <div class="analysis-header">
+                            <div class="analysis-title">
+                                <i class="fas fa-chart-bar"></i>
+                                Code Quality Score
+                            </div>
+                            <div class="analysis-score" id="qualityScore">0/100</div>
+                        </div>
+                        <div class="analysis-description" id="qualityDescription">
+                            Generate code to see quality analysis
+                        </div>
+                        
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-value" id="complexityScore">0</div>
+                                <div class="metric-label">Complexity</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="maintainabilityScore">0</div>
+                                <div class="metric-label">Maintainability</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="performanceScore">0</div>
+                                <div class="metric-label">Performance</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="securityScore">0</div>
+                                <div class="metric-label">Security</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="analysis-header">
+                            <div class="analysis-title">
+                                <i class="fas fa-lightbulb"></i>
+                                Optimization Suggestions
+                            </div>
+                            <div class="analysis-score" id="suggestionCount">0</div>
+                        </div>
+                        <div class="analysis-description" id="suggestionDescription">
+                            Suggestions will appear here after code generation
+                        </div>
+                        <div id="suggestionsList">
+                            <!-- Suggestions will be added here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ide-integration">
+                    <h3 class="section-title">
+                        <i class="fas fa-plug"></i>
+                        IDE Integration
+                    </h3>
+                    
+                    <div class="ide-badges">
+                        <div class="ide-badge">
+                            <i class="fas fa-code"></i>
+                            VS Code
+                        </div>
+                        <div class="ide-badge">
+                            <i class="fas fa-jet"></i>
+                            IntelliJ
+                        </div>
+                        <div class="ide-badge">
+                            <i class="fas fa-text-width"></i>
+                            Sublime Text
+                        </div>
+                        <div class="ide-badge">
+                            <i class="fas fa-terminal"></i>
+                            Terminal
+                        </div>
+                        <div class="ide-badge">
+                            <i class="fas fa-cloud"></i>
+                            Cloud IDE
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-success" id="exportBtn">
+                            <i class="fas fa-download"></i>
+                            Export to IDE
+                        </button>
+                        <button class="btn btn-secondary" id="saveSnippetBtn">
+                            <i class="fas fa-save"></i>
+                            Save Snippet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Back Button -->
+        <div style="text-align: center; margin: var(--spacing-2xl) 0;">
+            <a href="/" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to SparkDeck
+            </a>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="demo-footer">
+            <p>This is a demonstration of the <strong>Voice-to-Code Assistant</strong> concept from SparkDeck.</p>
+            <p>Voice recognition and code generation are simulated for demonstration purposes.</p>
+            <p>© 2024 SparkDeck | <a href="/">View more startup ideas</a></p>
+        </footer>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <h3>AI Generating Code...</h3>
+        <p class="loading-text">Analyzing requirements and generating optimized code</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    
+    <script>
+        // Sample code snippets for different languages
+        const codeSamples = {
+            javascript: `import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const UserTable = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'ascending' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('https://api.example.com/users');
+      setUsers(response.data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch users. Please try again later.');
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedUsers = [...users].sort((a, b) => {
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return sortConfig.direction === 'ascending' ? -1 : 1;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return sortConfig.direction === 'ascending' ? 1 : -1;
+    }
+    return 0;
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = sortedUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  if (loading) return <div className="loading">Loading users...</div>;
+  if (error) return <div className="error">{error}</div>;
+
+  return (
+    <div className="user-table">
+      <table>
+        <thead>
+          <tr>
+            <th onClick={() => handleSort('name')}>
+              Name {sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+            </th>
+            <th onClick={() => handleSort('email')}>
+              Email {sortConfig.key === 'email' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+            </th>
+            <th onClick={() => handleSort('role')}>
+              Role {sortConfig.key === 'role' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentUsers.map((user) => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>{user.role}</td>
+              <td>
+                <button onClick={() => console.log('Edit', user.id)}>Edit</button>
+                <button onClick={() => console.log('Delete', user.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      
+      <div className="pagination">
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+          <button
+            key={number}
+            onClick={() => paginate(number)}
+            className={currentPage === number ? 'active' : ''}
+          >
+            {number}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default UserTable;`,
+            
+            python: `from typing import List, Dict, Optional
+from dataclasses import dataclass
+import requests
+
+@dataclass
+class User:
+    id: int
+    name: str
+    email: str
+    role: str
+
+class UserTable:
+    def __init__(self):
+        self.users: List[User] = []
+        self.sort_key: str = 'name'
+        self.sort_ascending: bool = True
+        self.current_page: int = 1
+        self.items_per_page: int = 10
+        self.loading: bool = False
+        self.error: Optional[str] = None
+    
+    def fetch_users(self) -> None:
+        """Fetch users from API with error handling."""
+        self.loading = True
+        self.error = None
+        
+        try:
+            response = requests.get('https://api.example.com/users', timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            self.users = [
+                User(
+                    id=item['id'],
+                    name=item['name'],
+                    email=item['email'],
+                    role=item['role']
+                )
+                for item in data
+            ]
+        except requests.exceptions.RequestException as e:
+            self.error = f"Failed to fetch users: {str(e)}"
+            print(f"Error fetching users: {e}")
+        finally:
+            self.loading = False
+    
+    def sort_users(self, key: str) -> None:
+        """Sort users by specified key."""
+        if self.sort_key == key:
+            self.sort_ascending = not self.sort_ascending
+        else:
+            self.sort_key = key
+            self.sort_ascending = True
+    
+    def get_sorted_users(self) -> List[User]:
+        """Return users sorted by current sort configuration."""
+        return sorted(
+            self.users,
+            key=lambda x: getattr(x, self.sort_key),
+            reverse=not self.sort_ascending
+        )
+    
+    def get_paginated_users(self) -> List[User]:
+        """Return users for current page."""
+        sorted_users = self.get_sorted_users()
+        start_index = (self.current_page - 1) * self.items_per_page
+        end_index = start_index + self.items_per_page
+        return sorted_users[start_index:end_index]
+    
+    def get_total_pages(self) -> int:
+        """Calculate total number of pages."""
+        return max(1, (len(self.users) + self.items_per_page - 1) // self.items_per_page)
+    
+    def set_page(self, page: int) -> None:
+        """Set current page number."""
+        if 1 <= page <= self.get_total_pages():
+            self.current_page = page
+    
+    def render(self) -> str:
+        """Render the table as HTML string."""
+        if self.loading:
+            return '<div class="loading">Loading users...</div>'
+        
+        if self.error:
+            return f'<div class="error">{self.error}</div>'
+        
+        users = self.get_paginated_users()
+        total_pages = self.get_total_pages()
+        
+        # Generate table HTML
+        html = '<table class="user-table">\\n'
+        html += '  <thead>\\n    <tr>\\n'
+        
+        headers = ['name', 'email', 'role']
+        for header in headers:
+            arrow = ' ↑' if self.sort_key == header and self.sort_ascending else ' ↓' if self.sort_key == header else ''
+            html += f'      <th onclick="table.sort_users(\\'{header}\\')">{header.title()}{arrow}</th>\\n'
+        
+        html += '      <th>Actions</th>\\n'
+        html += '    </tr>\\n  </thead>\\n'
+        html += '  <tbody>\\n'
+        
+        for user in users:
+            html += f'    <tr>\\n'
+            html += f'      <td>{user.name}</td>\\n'
+            html += f'      <td>{user.email}</td>\\n'
+            html += f'      <td>{user.role}</td>\\n'
+            html += f'      <td>\\n'
+            html += f'        <button onclick="editUser({user.id})">Edit</button>\\n'
+            html += f'        <button onclick="deleteUser({user.id})">Delete</button>\\n'
+            html += f'      </td>\\n'
+            html += f'    </tr>\\n'
+        
+        html += '  </tbody>\\n</table>\\n'
+        
+        # Add pagination
+        if total_pages > 1:
+            html += '<div class="pagination">\\n'
+            for page in range(1, total_pages + 1):
+                active = ' active' if page == self.current_page else ''
+                html += f'  <button class="page-btn{active}" onclick="table.set_page({page})">{page}</button>\\n'
+            html += '</div>'
+        
+        return html
+
+# Example usage
+if __name__ == "__main__":
+    table = UserTable()
+    table.fetch_users()
+    print(table.render())`,
+            
+            java: `import java.util.*;
+import java.util.stream.Collectors;
+
+class User {
+    private int id;
+    private String name;
+    private String email;
+    private String role;
+    
+    public User(int id, String name, String email, String role) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.role = role;
+    }
+    
+    // Getters and setters
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public String getEmail() { return email; }
+    public String getRole() { return role; }
+    
+    public void setId(int id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setEmail(String email) { this.email = email; }
+    public void setRole(String role) { this.role = role; }
+    
+    @Override
+    public String toString() {
+        return "User{id=" + id + ", name='" + name + "', email='" + email + "', role='" + role + "'}";
+    }
+}
+
+class UserTable {
+    private List<User> users;
+    private String sortKey;
+    private boolean sortAscending;
+    private int currentPage;
+    private int itemsPerPage;
+    private boolean loading;
+    private String error;
+    
+    public UserTable() {
+        this.users = new ArrayList<>();
+        this.sortKey = "name";
+        this.sortAscending = true;
+        this.currentPage = 1;
+        this.itemsPerPage = 10;
+        this.loading = false;
+        this.error = null;
+    }
+    
+    public void fetchUsers() {
+        this.loading = true;
+        this.error = null;
+        
+        try {
+            // Simulate API call - in real implementation, use HttpClient
+            // List<User> fetchedUsers = apiClient.getUsers();
+            // this.users = fetchedUsers;
+            
+            // For demo, add some sample users
+            this.users = Arrays.asList(
+                new User(1, "John Doe", "john@example.com", "Admin"),
+                new User(2, "Jane Smith", "jane@example.com", "User"),
+                new User(3, "Bob Johnson", "bob@example.com", "Moderator")
+            );
+            
+            // Simulate network delay
+            Thread.sleep(500);
+        } catch (Exception e) {
+            this.error = "Failed to fetch users: " + e.getMessage();
+            System.err.println("Error fetching users: " + e);
+        } finally {
+            this.loading = false;
+        }
+    }
+    
+    public void sortUsers(String key) {
+        if (this.sortKey.equals(key)) {
+            this.sortAscending = !this.sortAscending;
+        } else {
+            this.sortKey = key;
+            this.sortAscending = true;
+        }
+    }
+    
+    public List<User> getSortedUsers() {
+        Comparator<User> comparator = null;
+        
+        switch (sortKey) {
+            case "name":
+                comparator = Comparator.comparing(User::getName);
+                break;
+            case "email":
+                comparator = Comparator.comparing(User::getEmail);
+                break;
+            case "role":
+                comparator = Comparator.comparing(User::getRole);
+                break;
+            default:
+                comparator = Comparator.comparing(User::getId);
+        }
+        
+        if (!sortAscending) {
+            comparator = comparator.reversed();
+        }
+        
+        return users.stream()
+                   .sorted(comparator)
+                   .collect(Collectors.toList());
+    }
+    
+    public List<User> getPaginatedUsers() {
+        List<User> sortedUsers = getSortedUsers();
+        int startIndex = (currentPage - 1) * itemsPerPage;
+        int endIndex = Math.min(startIndex + itemsPerPage, sortedUsers.size());
+        
+        if (startIndex >= sortedUsers.size()) {
+            return new ArrayList<>();
+        }
+        
+        return sortedUsers.subList(startIndex, endIndex);
+    }
+    
+    public int getTotalPages() {
+        return (int) Math.ceil((double) users.size() / itemsPerPage);
+    }
+    
+    public void setPage(int page) {
+        if (page >= 1 && page <= getTotalPages()) {
+            this.currentPage = page;
+        }
+    }
+    
+    public String render() {
+        if (loading) {
+            return "<div class=\"loading\">Loading users...</div>";
+        }
+        
+        if (error != null) {
+            return "<div class=\"error\">" + error + "</div>";
+        }
+        
+        List<User> currentUsers = getPaginatedUsers();
+        int totalPages = getTotalPages();
+        
+        StringBuilder html = new StringBuilder();
+        html.append("<table class=\"user-table\">\\n");
+        html.append("  <thead>\\n    <tr>\\n");
+        
+        String[] headers = {"name", "email", "role"};
+        for (String header : headers) {
+            String arrow = "";
+            if (sortKey.equals(header)) {
+                arrow = sortAscending ? " ↑" : " ↓";
+            }
+            html.append("      <th onclick=\"table.sortUsers('").append(header).append("')\">")
+                .append(header.substring(0, 1).toUpperCase()).append(header.substring(1))
+                .append(arrow).append("</th>\\n");
+        }
+        
+        html.append("      <th>Actions</th>\\n");
+        html.append("    </tr>\\n  </thead>\\n");
+        html.append("  <tbody>\\n");
+        
+        for (User user : currentUsers) {
+            html.append("    <tr>\\n");
+            html.append("      <td>").append(user.getName()).append("</td>\\n");
+            html.append("      <td>").append(user.getEmail()).append("</td>\\n");
+            html.append("      <td>").append(user.getRole()).append("</td>\\n");
+            html.append("      <td>\\n");
+            html.append("        <button onclick=\"editUser(").append(user.getId()).append(")\">Edit</button>\\n");
+            html.append("        <button onclick=\"deleteUser(").append(user.getId()).append(")\">Delete</button>\\n");
+            html.append("      </td>\\n");
+            html.append("    </tr>\\n");
+        }
+        
+        html.append("  </tbody>\\n</table>\\n");
+        
+        if (totalPages > 1) {
+            html.append("<div class=\"pagination\">\\n");
+            for (int page = 1; page <= totalPages; page++) {
+                String active = (page == currentPage) ? " active" : "";
+                html.append("  <button class=\"page-btn").append(active)
+                    .append("\" onclick=\"table.setPage(").append(page).append(")\">")
+                    .append(page).append("</button>\\n");
+            }
+            html.append("</div>");
+        }
+        
+        return html.toString();
+    }
+}`,
+            
+            cpp: `#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <stdexcept>
+
+class User {
+private:
+    int id;
+    std::string name;
+    std::string email;
+    std::string role;
+
+public:
+    User(int id, const std::string& name, const std::string& email, const std::string& role)
+        : id(id), name(name), email(email), role(role) {}
+
+    // Getters
+    int getId() const { return id; }
+    const std::string& getName() const { return name; }
+    const std::string& getEmail() const { return email; }
+    const std::string& getRole() const { return role; }
+
+    // Setters
+    void setId(int newId) { id = newId; }
+    void setName(const std::string& newName) { name = newName; }
+    void setEmail(const std::string& newEmail) { email = newEmail; }
+    void setRole(const std::string& newRole) { role = newRole; }
+
+    friend std::ostream& operator<<(std::ostream& os, const User& user) {
+        os << "User{id=" << user.id 
+           << ", name='" << user.name 
+           << "', email='" << user.email 
+           << "', role='" << user.role << "'}";
+        return os;
+    }
+};
+
+class UserTable {
+private:
+    std::vector<User> users;
+    std::string sortKey;
+    bool sortAscending;
+    int currentPage;
+    int itemsPerPage;
+    bool loading;
+    std::string error;
+
+public:
+    UserTable() 
+        : sortKey("name"), sortAscending(true), 
+          currentPage(1), itemsPerPage(10), 
+          loading(false), error("") {}
+
+    void fetchUsers() {
+        loading = true;
+        error = "";
+
+        try {
+            // Simulate API call - in real implementation, use HTTP library
+            // For demo, add sample users
+            users = {
+                User(1, "John Doe", "john@example.com", "Admin"),
+                User(2, "Jane Smith", "jane@example.com", "User"),
+                User(3, "Bob Johnson", "bob@example.com", "Moderator"),
+                User(4, "Alice Brown", "alice@example.com", "User"),
+                User(5, "Charlie Wilson", "charlie@example.com", "Admin")
+            };
+
+            // Simulate network delay
+            // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        } catch (const std::exception& e) {
+            error = "Failed to fetch users: " + std::string(e.what());
+            std::cerr << "Error fetching users: " << e.what() << std::endl;
+        } catch (...) {
+            error = "Failed to fetch users: Unknown error";
+            std::cerr << "Unknown error fetching users" << std::endl;
+        }
+
+        loading = false;
+    }
+
+    void sortUsers(const std::string& key) {
+        if (sortKey == key) {
+            sortAscending = !sortAscending;
+        } else {
+            sortKey = key;
+            sortAscending = true;
+        }
+    }
+
+    std::vector<User> getSortedUsers() const {
+        std::vector<User> sortedUsers = users;
+
+        auto comparator = [this](const User& a, const User& b) {
+            if (sortKey == "name") {
+                return sortAscending ? a.getName() < b.getName() : a.getName() > b.getName();
+            } else if (sortKey == "email") {
+                return sortAscending ? a.getEmail() < b.getEmail() : a.getEmail() > b.getEmail();
+            } else if (sortKey == "role") {
+                return sortAscending ? a.getRole() < b.getRole() : a.getRole() > b.getRole();
+            }
+            return sortAscending ? a.getId() < b.getId() : a.getId() > b.getId();
+        };
+
+        std::sort(sortedUsers.begin(), sortedUsers.end(), comparator);
+        return sortedUsers;
+    }
+
+    std::vector<User> getPaginatedUsers() const {
+        std::vector<User> sortedUsers = getSortedUsers();
+        int startIndex = (currentPage - 1) * itemsPerPage;
+        int endIndex = std::min(startIndex + itemsPerPage, static_cast<int>(sortedUsers.size()));
+
+        if (startIndex >= sortedUsers.size()) {
+            return {};
+        }
+
+        return std::vector<User>(sortedUsers.begin() + startIndex, sortedUsers.begin() + endIndex);
+    }
+
+    int getTotalPages() const {
+        return std::max(1, (static_cast<int>(users.size()) + itemsPerPage - 1) / itemsPerPage);
+    }
+
+    void setPage(int page) {
+        if (page >= 1 && page <= getTotalPages()) {
+            currentPage = page;
+        }
+    }
+
+    std::string render() const {
+        if (loading) {
+            return "<div class=\"loading\">Loading users...</div>";
+        }
+
+        if (!error.empty()) {
+            return "<div class=\"error\">" + error + "</div>";
+        }
+
+        std::vector<User> currentUsers = getPaginatedUsers();
+        int totalPages = getTotalPages();
+
+        std::string html = "<table class=\"user-table\">\\n";
+        html += "  <thead>\\n    <tr>\\n";
+
+        std::vector<std::string> headers = {"name", "email", "role"};
+        for (const auto& header : headers) {
+            std::string arrow = "";
+            if (sortKey == header) {
+                arrow = sortAscending ? " ↑" : " ↓";
+            }
+            html += "      <th onclick=\"table.sortUsers('" + header + "')\">" 
+                    + header.substr(0, 1) 
+                    + header.substr(1) + arrow + "</th>\\n";
+        }
+
+        html += "      <th>Actions</th>\\n";
+        html += "    </tr>\\n  </thead>\\n";
+        html += "  <tbody>\\n";
+
+        for (const auto& user : currentUsers) {
+            html += "    <tr>\\n";
+            html += "      <td>" + user.getName() + "</td>\\n";
+            html += "      <td>" + user.getEmail() + "</td>\\n";
+            html += "      <td>" + user.getRole() + "</td>\\n";
+            html += "      <td>\\n";
+            html += "        <button onclick=\"editUser(" + std::to_string(user.getId()) + ")\">Edit</button>\\n";
+            html += "        <button onclick=\"deleteUser(" + std::to_string(user.getId()) + ")\">Delete</button>\\n";
+            html += "      </td>\\n";
+            html += "    </tr>\\n";
+        }
+
+        html += "  </tbody>\\n</table>\\n";
+
+        if (totalPages > 1) {
+            html += "<div class=\"pagination\">\\n";
+            for (int page = 1; page <= totalPages; ++page) {
+                std::string active = (page == currentPage) ? " active" : "";
+                html += "  <button class=\"page-btn" + active 
+                        + "\" onclick=\"table.setPage(" + std::to_string(page) + ")\">"
+                        + std::to_string(page) + "</button>\\n";
+            }
+            html += "</div>";
+        }
+
+        return html;
+    }
+};`,
+            
+            typescript: `import React, { useState, useEffect, useCallback } from 'react';
+import axios, { AxiosError } from 'axios';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+interface SortConfig {
+  key: keyof User;
+  direction: 'ascending' | 'descending';
+}
+
+interface PaginationConfig {
+  currentPage: number;
+  itemsPerPage: number;
+}
+
+const UserTable: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ 
+    key: 'name', 
+    direction: 'ascending' 
+  });
+  const [pagination, setPagination] = useState<PaginationConfig>({
+    currentPage: 1,
+    itemsPerPage: 10
+  });
+
+  const fetchUsers = useCallback(async (): Promise<void> => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await axios.get<User[]>('https://api.example.com/users', {
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      setUsers(response.data);
+    } catch (err) {
+      const error = err as AxiosError;
+      setError(error.response?.status === 404 
+        ? 'Users endpoint not found. Please check the API URL.'
+        : 'Failed to fetch users. Please try again later.'
+      );
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  const handleSort = (key: keyof User): void => {
+    setSortConfig(prevConfig => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === 'ascending' 
+        ? 'descending' 
+        : 'ascending'
+    }));
+  };
+
+  const handlePageChange = (pageNumber: number): void => {
+    setPagination(prev => ({
+      ...prev,
+      currentPage: pageNumber
+    }));
+  };
+
+  const sortedUsers = [...users].sort((a, b) => {
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return sortConfig.direction === 'ascending' ? -1 : 1;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return sortConfig.direction === 'ascending' ? 1 : -1;
+    }
+    return 0;
+  });
+
+  const totalPages = Math.ceil(users.length / pagination.itemsPerPage);
+  const startIndex = (pagination.currentPage - 1) * pagination.itemsPerPage;
+  const paginatedUsers = sortedUsers.slice(startIndex, startIndex + pagination.itemsPerPage);
+
+  if (loading) {
+    return (
+      <div className="loading-state">
+        <div className="spinner"></div>
+        <p>Loading users...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-state">
+        <div className="error-icon">⚠️</div>
+        <p>{error}</p>
+        <button onClick={() => fetchUsers()} className="retry-btn">
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="user-table-container">
+      <div className="table-header">
+        <h2>User Management</h2>
+        <div className="table-controls">
+          <button onClick={() => fetchUsers()} className="refresh-btn">
+            Refresh
+          </button>
+          <select 
+            value={pagination.itemsPerPage}
+            onChange={(e) => setPagination(prev => ({
+              ...prev,
+              itemsPerPage: parseInt(e.target.value),
+              currentPage: 1
+            }))}
+            className="items-per-page"
+          >
+            <option value={5}>5 per page</option>
+            <option value={10}>10 per page</option>
+            <option value={20}>20 per page</option>
+            <option value={50}>50 per page</option>
+          </select>
+        </div>
+      </div>
+
+      <table className="user-table">
+        <thead>
+          <tr>
+            {(['name', 'email', 'role'] as (keyof User)[]).map((column) => (
+              <th 
+                key={column}
+                onClick={() => handleSort(column)}
+                className={`sortable ${sortConfig.key === column ? 'active' : ''}`}
+              >
+                <span>
+                  {column.charAt(0).toUpperCase() + column.slice(1)}
+                  {sortConfig.key === column && (
+                    <span className="sort-indicator">
+                      {sortConfig.direction === 'ascending' ? ' ↑' : ' ↓'}
+                    </span>
+                  )}
+                </span>
+              </th>
+            ))}
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedUsers.map((user) => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>
+                <span className={`role-badge role-${user.role.toLowerCase()}`}>
+                  {user.role}
+                </span>
+              </td>
+              <td className="action-buttons">
+                <button 
+                  onClick={() => console.log('Edit', user.id)}
+                  className="edit-btn"
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={() => console.log('Delete', user.id)}
+                  className="delete-btn"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => handlePageChange(pagination.currentPage - 1)}
+            disabled={pagination.currentPage === 1}
+            className="page-nav"
+          >
+            Previous
+          </button>
+          
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={`page-number ${pagination.currentPage === page ? 'active' : ''}`}
+            >
+              {page}
+            </button>
+          ))}
+          
+          <button
+            onClick={() => handlePageChange(pagination.currentPage + 1)}
+            disabled={pagination.currentPage === totalPages}
+            className="page-nav"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      <div className="table-footer">
+        <p>
+          Showing {startIndex + 1} to {Math.min(startIndex + pagination.itemsPerPage, users.length)} 
+          of {users.length} users
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default UserTable;`
+        };
+
+        // Sample quality metrics
+        const qualityMetrics = {
+            javascript: { quality: 88, complexity: 75, maintainability: 85, performance: 90, security: 82 },
+            python: { quality: 92, complexity: 80, maintainability: 88, performance: 85, security: 90 },
+            java: { quality: 85, complexity: 70, maintainability: 80, performance: 88, security: 87 },
+            cpp: { quality: 82, complexity: 65, maintainability: 75, performance: 95, security: 85 },
+            typescript: { quality: 95, complexity: 85, maintainability: 92, performance: 88, security: 90 }
+        };
+
+        // Sample suggestions
+        const suggestions = {
+            javascript: [
+                "Add PropTypes or TypeScript for better type safety",
+                "Consider using React Query for better API state management",
+                "Implement error boundaries for better error handling",
+                "Add debouncing to sort and pagination handlers",
+                "Consider using a virtualized table for large datasets"
+            ],
+            python: [
+                "Add docstrings to all public methods",
+                "Consider using async/await for the API call",
+                "Add input validation for the fetch method",
+                "Implement caching for API responses",
+                "Add logging for better debugging"
+            ],
+            java: [
+                "Consider using Java Streams more extensively",
+                "Add proper exception handling for edge cases",
+                "Implement builder pattern for User class",
+                "Consider using Lombok to reduce boilerplate",
+                "Add unit tests for sorting and pagination logic"
+            ],
+            cpp: [
+                "Consider using smart pointers for better memory management",
+                "Add move constructors for better performance",
+                "Implement copy-and-swap idiom for exception safety",
+                "Consider using templates for generic sorting",
+                "Add const correctness where applicable"
+            ],
+            typescript: [
+                "Add more specific type definitions for API responses",
+                "Consider using discriminated unions for error states",
+                "Add unit tests with TypeScript",
+                "Implement custom hooks for better reusability",
+                "Add accessibility attributes to table elements"
+            ]
+        };
+
+        // DOM Elements
+        const voiceButton = document.getElementById('voiceButton');
+        const waveContainer = document.getElementById('waveContainer');
+        const voiceStatus = document.getElementById('voiceStatus');
+        const textInput = document.getElementById('textInput');
+        const languageTabs = document.getElementById('languageTabs');
+        const generateBtn = document.getElementById('generateBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const formatBtn = document.getElementById('formatBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const saveSnippetBtn = document.getElementById('saveSnippetBtn');
+        const codeOutput = document.getElementById('codeOutput');
+        const currentLanguage = document.getElementById('currentLanguage');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const qualityScore = document.getElementById('qualityScore');
+        const qualityDescription = document.getElementById('qualityDescription');
+        const complexityScore = document.getElementById('complexityScore');
+        const maintainabilityScore = document.getElementById('maintainabilityScore');
+        const performanceScore = document.getElementById('performanceScore');
+        const securityScore = document.getElementById('securityScore');
+        const suggestionCount = document.getElementById('suggestionCount');
+        const suggestionDescription = document.getElementById('suggestionDescription');
+        const suggestionsList = document.getElementById('suggestionsList');
+        
+        // Prompt cards
+        const promptCards = document.querySelectorAll('.prompt-card');
+
+        // State
+        let isListening = false;
+        let currentLang = 'javascript';
+        let currentCode = '';
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up event listeners
+            voiceButton.addEventListener('click', toggleVoiceRecording);
+            generateBtn.addEventListener('click', generateCode);
+            clearBtn.addEventListener('click', clearInput);
+            copyBtn.addEventListener('click', copyCode);
+            formatBtn.addEventListener('click', formatCode);
+            exportBtn.addEventListener('click', exportToIDE);
+            saveSnippetBtn.addEventListener('click', saveSnippet);
+            
+            // Language tabs
+            languageTabs.querySelectorAll('.language-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update active tab
+                    languageTabs.querySelectorAll('.language-tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Update current language
+                    currentLang = this.dataset.language;
+                    currentLanguage.textContent = this.textContent;
+                    
+                    // Update code output if we have code
+                    if (currentCode) {
+                        updateCodeOutput();
+                    }
+                });
+            });
+            
+            // Prompt cards
+            promptCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const prompt = this.dataset.prompt;
+                    textInput.value = prompt;
+                    generateCode();
+                });
+            });
+            
+            // Initialize with sample code
+            updateCodeOutput();
+            updateQualityAnalysis();
+        });
+        
+        function toggleVoiceRecording() {
+            if (!isListening) {
+                // Start listening
+                isListening = true;
+                voiceButton.classList.add('listening');
+                voiceButton.innerHTML = '<i class="fas fa-stop"></i>';
+                waveContainer.style.display = 'flex';
+                voiceStatus.textContent = 'Listening... Speak now';
+                voiceStatus.classList.add('active');
+                
+                // Simulate speech recognition
+                setTimeout(() => {
+                    const sampleText = "Create a React component that displays user data in a table with sorting and pagination.";
+                    textInput.value = sampleText;
+                    
+                    // Stop after 3 seconds
+                    stopVoiceRecording();
+                    
+                    // Generate code after a short delay
+                    setTimeout(generateCode, 500);
+                }, 3000);
+            } else {
+                stopVoiceRecording();
+            }
+        }
+        
+        function stopVoiceRecording() {
+            isListening = false;
+            voiceButton.classList.remove('listening');
+            voiceButton.innerHTML = '<i class="fas fa-microphone"></i>';
+            waveContainer.style.display = 'none';
+            voiceStatus.textContent = 'Click the microphone to start speaking';
+            voiceStatus.classList.remove('active');
+        }
+        
+        function generateCode() {
+            // Show loading overlay
+            loadingOverlay.classList.add('active');
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                // Hide loading overlay
+                loadingOverlay.classList.remove('active');
+                
+                // Update code output
+                updateCodeOutput();
+                
+                // Update quality analysis
+                updateQualityAnalysis();
+                
+                // Show success message
+                showNotification('Code generated successfully!');
+            }, 1500);
+        }
+        
+        function updateCodeOutput() {
+            currentCode = codeSamples[currentLang];
+            
+            // Update code display
+            codeOutput.textContent = currentCode;
+            codeOutput.className = `language-${currentLang}`;
+            
+            // Highlight syntax
+            Prism.highlightElement(codeOutput);
+        }
+        
+        function updateQualityAnalysis() {
+            const metrics = qualityMetrics[currentLang];
+            const langSuggestions = suggestions[currentLang];
+            
+            // Update scores
+            qualityScore.textContent = `${metrics.quality}/100`;
+            complexityScore.textContent = metrics.complexity;
+            maintainabilityScore.textContent = metrics.maintainability;
+            performanceScore.textContent = metrics.performance;
+            securityScore.textContent = metrics.security;
+            
+            // Update descriptions
+            let qualityDesc = '';
+            if (metrics.quality >= 90) {
+                qualityDesc = 'Excellent code quality! Production ready.';
+            } else if (metrics.quality >= 80) {
+                qualityDesc = 'Good code quality. Ready for production with minor improvements.';
+            } else if (metrics.quality >= 70) {
+                qualityDesc = 'Average code quality. Consider implementing suggestions.';
+            } else {
+                qualityDesc = 'Needs improvement. Review suggestions below.';
+            }
+            qualityDescription.textContent = qualityDesc;
+            
+            // Update suggestions
+            suggestionCount.textContent = langSuggestions.length;
+            suggestionDescription.textContent = `Found ${langSuggestions.length} optimization suggestions`;
+            
+            // Clear and update suggestions list
+            suggestionsList.innerHTML = '';
+            langSuggestions.forEach((suggestion, index) => {
+                const suggestionItem = document.createElement('div');
+                suggestionItem.className = 'suggestion-item';
+                suggestionItem.innerHTML = `
+                    <div style="display: flex; align-items: flex-start; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm);">
+                        <i class="fas fa-lightbulb" style="color: var(--accent); margin-top: 2px;"></i>
+                        <span style="color: #cbd5e1; font-size: 0.9rem;">${suggestion}</span>
+                    </div>
+                `;
+                suggestionsList.appendChild(suggestionItem);
+            });
+        }
+        
+        function clearInput() {
+            textInput.value = '';
+            showNotification('Input cleared');
+        }
+        
+        function copyCode() {
+            navigator.clipboard.writeText(currentCode).then(() => {
+                showNotification('Code copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy code:', err);
+                showNotification('Failed to copy code');
+            });
+        }
+        
+        function formatCode() {
+            // In a real app, this would format the code
+            showNotification('Code formatted');
+        }
+        
+        function exportToIDE() {
+            showNotification(`Code exported to ${currentLanguage.textContent} project`);
+        }
+        
+        function saveSnippet() {
+            showNotification('Code snippet saved to your library');
+        }
+        
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'toast show';
+            notification.style.position = 'fixed';
+            notification.style.bottom = 'var(--spacing-xl)';
+            notification.style.right = 'var(--spacing-xl)';
+            notification.style.background = 'var(--dark)';
+            notification.style.color = 'white';
+            notification.style.padding = 'var(--spacing-md) var(--spacing-lg)';
+            notification.style.borderRadius = 'var(--radius-md)';
+            notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            notification.style.display = 'flex';
+            notification.style.alignItems = 'center';
+            notification.style.gap = 'var(--spacing-md)';
+            notification.style.zIndex = '1001';
+            notification.innerHTML = `
+                <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Initialize with a welcome message
+        setTimeout(() => {
+            showNotification('Try describing a feature or click an example prompt!');
+        }, 1000);
+    </script>
+</body>
+</html>

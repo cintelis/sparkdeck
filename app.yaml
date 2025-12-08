@@ -1,0 +1,25 @@
+runtime: nodejs18
+service: sparkdeck
+
+handlers:
+  - url: /styles
+    static_dir: public/styles
+  - url: /js
+    static_dir: public/js
+  - url: /images
+    static_dir: public/images
+  - url: /assets
+    static_dir: public/assets
+  - url: /.*
+    script: auto
+    secure: always
+
+env_variables:
+  NODE_ENV: "production"
+  PORT: "8080"
+
+automatic_scaling:
+  min_instances: 1
+  max_instances: 5
+  target_cpu_utilization: 0.65
+  target_throughput_utilization: 0.65

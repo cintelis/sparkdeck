@@ -1,0 +1,79 @@
+{
+  "ideas": [
+    {
+      "id": 1,
+      "title": "Waitlist Manager Pro",
+      "subtitle": "Smart waitlist management for events, launches, and restaurants",
+      "category": "saas",
+      "complexity": 2,
+      "rating": 4.5,
+      "description": "A comprehensive waitlist management system that helps businesses manage sign-ups, send automated updates, and reduce no-shows.",
+      "features": [
+        "Automated email/SMS notifications",
+        "Real-time analytics dashboard",
+        "Calendar integration",
+        "Customizable booking forms"
+      ],
+      "problem": "Businesses struggle with manual waitlist management and poor customer communication.",
+      "solution": "Automated system that manages waitlists and keeps customers informed.",
+      "tags": ["SaaS", "Events", "Restaurants", "Automation"],
+      "demoUrl": "/demo/waitlist-manager.html",
+      "color": "#6366f1",
+      "icon": "fas fa-list-ol",
+      "createdAt": "2024-01-15",
+      "updatedAt": "2024-01-20"
+    },
+    {
+      "id": 2,
+      "title": "Social Proof Notifications",
+      "subtitle": "Boost conversions with real-time purchase notifications",
+      "category": "saas",
+      "complexity": 1,
+      "rating": 4.2,
+      "description": "A widget for e-commerce sites that displays recent purchases and sign-ups to build trust and urgency.",
+      "features": [
+        "Customizable notification styles",
+        "Real-time updates",
+        "Analytics dashboard",
+        "Easy integration"
+      ],
+      "problem": "E-commerce sites lack social proof to build customer trust.",
+      "solution": "Real-time notifications showing recent customer activity.",
+      "tags": ["SaaS", "E-commerce", "Social Proof", "Conversion"],
+      "demoUrl": "/demo/social-proof.html",
+      "color": "#10b981",
+      "icon": "fas fa-bell",
+      "createdAt": "2024-01-10",
+      "updatedAt": "2024-01-18"
+    },
+    {
+      "id": 3,
+      "title": "Home Inventory Manager",
+      "subtitle": "Insurance-ready home inventory management",
+      "category": "tech",
+      "complexity": 3,
+      "rating": 4.8,
+      "description": "Mobile-first app for cataloging household items with photos and receipts for insurance purposes.",
+      "features": [
+        "Room-by-room organization",
+        "Photo and receipt upload",
+        "PDF report generation",
+        "Cloud backup"
+      ],
+      "problem": "Homeowners struggle to document possessions for insurance claims.",
+      "solution": "Easy-to-use app for organizing and documenting household items.",
+      "tags": ["Mobile", "Insurance", "Home", "Organization"],
+      "demoUrl": "/demo/home-inventory.html",
+      "color": "#f59e0b",
+      "icon": "fas fa-home",
+      "createdAt": "2024-01-05",
+      "updatedAt": "2024-01-12"
+    }
+  ],
+  "stats": {
+    "totalIdeas": 3,
+    "categories": ["saas", "tech"],
+    "averageRating": 4.5,
+    "lastUpdated": "2024-01-20T10:30:00Z"
+  }
+}

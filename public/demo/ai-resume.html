@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Builder Demo | SparkDeck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --border: #cbd5e1;
+            --card-bg: #ffffff;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-heading: 'Space Grotesk', sans-serif;
+            
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-xl);
+        }
+        
+        /* Header */
+        .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg) 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .demo-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .demo-logo i {
+            color: var(--accent);
+        }
+        
+        .demo-badge {
+            background: var(--primary);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .back-button:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Hero Section */
+        .demo-hero {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-xl);
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .demo-title {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--dark);
+        }
+        
+        .demo-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 800px;
+            margin: 0 auto var(--spacing-xl);
+        }
+        
+        .demo-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .feature-card {
+            background: var(--light);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+        
+        .feature-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        /* Main Content */
+        .demo-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        @media (max-width: 1024px) {
+            .demo-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Input Section */
+        .input-section, .output-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-lg);
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .section-title i {
+            color: var(--primary);
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        /* Resume Upload */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-xl);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.02);
+        }
+        
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        /* Job Description */
+        .job-description {
+            background: var(--light);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .job-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--dark);
+        }
+        
+        .job-company {
+            color: var(--gray);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        /* Resume Preview */
+        .resume-preview {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .resume-header {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .resume-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .resume-title {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .resume-section {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .section-heading {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: var(--spacing-sm);
+            padding-bottom: var(--spacing-xs);
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .resume-item {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .item-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .item-subtitle {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .item-description {
+            margin-top: var(--spacing-xs);
+            font-size: 0.95rem;
+        }
+        
+        /* AI Optimization Results */
+        .optimization-results {
+            margin-top: var(--spacing-lg);
+        }
+        
+        .result-card {
+            background: var(--light);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .result-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .result-score {
+            background: var(--secondary);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-weight: 600;
+        }
+        
+        .result-description {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+        
+        .keyword-match {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+        }
+        
+        .keyword {
+            background: var(--success-bg);
+            color: var(--success-text);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .keyword.missing {
+            background: var(--light-gray);
+            color: var(--gray);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-xl);
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-success {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #0da271;
+            transform: translateY(-2px);
+        }
+        
+        .btn-large {
+            padding: var(--spacing-lg) var(--spacing-xl);
+            font-size: 1.1rem;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+        
+        /* Comparison View */
+        .comparison-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-view {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .comparison-column {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .column-header {
+            text-align: center;
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .column-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .column-badge {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: var(--spacing-sm);
+        }
+        
+        .badge-original {
+            background: var(--light-gray);
+            color: var(--gray);
+        }
+        
+        .badge-optimized {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+        
+        .improvement-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: var(--secondary);
+            font-weight: 600;
+            margin-top: var(--spacing-sm);
+        }
+        
+        /* Footer */
+        .demo-footer {
+            text-align: center;
+            padding: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+            border-top: 1px solid var(--border);
+            color: var(--gray);
+        }
+        
+        .demo-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .demo-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--light-gray);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: var(--spacing-xl);
+            right: var(--spacing-xl);
+            background: var(--dark);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            z-index: 1001;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast i {
+            font-size: 1.2rem;
+        }
+        
+        .toast.success i {
+            color: var(--secondary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .demo-container {
+                padding: var(--spacing-md);
+            }
+            
+            .demo-title {
+                font-size: 2rem;
+            }
+            
+            .demo-hero {
+                padding: var(--spacing-lg);
+            }
+            
+            .demo-content {
+                gap: var(--spacing-lg);
+            }
+            
+            .input-section, .output-section {
+                padding: var(--spacing-lg);
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <header class="demo-header">
+            <div class="demo-logo">
+                <i class="fas fa-robot"></i>
+                <span>AI Resume Builder</span>
+            </div>
+            <div class="demo-badge">
+                SparkDeck Demo
+            </div>
+        </header>
+        
+        <!-- Hero Section -->
+        <section class="demo-hero">
+            <h1 class="demo-title">AI-Powered Resume Optimization</h1>
+            <p class="demo-subtitle">Get past ATS systems and impress recruiters with AI-optimized resumes tailored to specific job descriptions.</p>
+            
+            <div class="demo-features">
+                <div class="feature-card">
+                    <i class="fas fa-brain"></i>
+                    <h3>AI Analysis</h3>
+                    <p>Analyzes job descriptions and matches your skills</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-search"></i>
+                    <h3>ATS Optimization</h3>
+                    <p>Optimizes for Applicant Tracking Systems</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Score Improvement</h3>
+                    <p>Shows before/after optimization scores</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Quick Results</h3>
+                    <p>Get optimized resumes in seconds</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Main Content -->
+        <div class="demo-content">
+            <!-- Input Section -->
+            <div class="input-section">
+                <h2 class="section-title">
+                    <i class="fas fa-upload"></i>
+                    Upload Your Resume
+                </h2>
+                
+                <div class="form-group">
+                    <label>Upload Resume (PDF, DOC, TXT)</label>
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & drop your resume here</p>
+                        <p style="font-size: 0.9rem; color: var(--gray);">or click to browse</p>
+                        <input type="file" id="resumeUpload" accept=".pdf,.doc,.docx,.txt" style="display: none;">
+                    </div>
+                    <div id="fileName" style="text-align: center; color: var(--gray); font-size: 0.9rem;"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Or Enter Resume Manually</label>
+                    <textarea id="manualResume" placeholder="Paste your resume text here..."></textarea>
+                </div>
+                
+                <div class="job-description">
+                    <h3 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Target Job Description
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="jobTitle">Job Title</label>
+                        <input type="text" id="jobTitle" value="Senior Frontend Developer" placeholder="Enter job title">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jobDescription">Paste Job Description</label>
+                        <textarea id="jobDescription" placeholder="Paste the full job description here...">We are looking for a Senior Frontend Developer with expertise in React, TypeScript, and modern web development practices. The ideal candidate will have 5+ years of experience building scalable web applications, strong knowledge of state management (Redux, Context API), and experience with testing frameworks (Jest, React Testing Library). Responsibilities include developing new user-facing features, building reusable components, optimizing applications for performance, and collaborating with cross-functional teams. Required skills: React, TypeScript, JavaScript ES6+, HTML5, CSS3, Git, REST APIs, Agile methodologies. Nice to have: Next.js, GraphQL, Webpack, CI/CD pipelines, AWS.</textarea>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary btn-large" id="analyzeBtn">
+                        <i class="fas fa-magic"></i>
+                        AI Optimize Resume
+                    </button>
+                    <button class="btn btn-secondary" id="loadSampleBtn">
+                        <i class="fas fa-vial"></i>
+                        Load Sample Data
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Output Section -->
+            <div class="output-section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Optimization Results
+                </h2>
+                
+                <div class="optimization-results" id="optimizationResults">
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div class="result-title">ATS Compatibility Score</div>
+                            <div class="result-score" id="atsScore">0/100</div>
+                        </div>
+                        <div class="result-description" id="atsDescription">
+                            Upload your resume and job description to see your ATS compatibility score.
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div class="result-title">Keyword Match</div>
+                            <div class="result-score" id="keywordScore">0%</div>
+                        </div>
+                        <div class="result-description" id="keywordDescription">
+                            See how well your resume matches the job description keywords.
+                        </div>
+                        <div class="keyword-match" id="keywordMatch">
+                            <!-- Keywords will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div class="result-title">Skills Gap Analysis</div>
+                            <div class="result-score" id="skillsScore">0%</div>
+                        </div>
+                        <div class="result-description" id="skillsDescription">
+                            Identifies missing skills and suggests improvements.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resume-preview" id="resumePreview">
+                    <div class="resume-header">
+                        <div class="resume-name" id="previewName">Your Name</div>
+                        <div class="resume-title" id="previewTitle">Your Professional Title</div>
+                    </div>
+                    
+                    <div class="resume-section">
+                        <div class="section-heading">Summary</div>
+                        <div class="resume-item">
+                            <div class="item-description" id="previewSummary">
+                                Upload your resume to see a preview here.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resume-section">
+                        <div class="section-heading">Experience</div>
+                        <div class="resume-item">
+                            <div class="item-title" id="previewJobTitle">Job Title</div>
+                            <div class="item-subtitle" id="previewJobDetails">Company • Dates</div>
+                            <div class="item-description" id="previewJobDescription">
+                                Job responsibilities and achievements will appear here.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="resume-section">
+                        <div class="section-heading">Skills</div>
+                        <div class="resume-item">
+                            <div class="item-description" id="previewSkills">
+                                Your skills will be listed here.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-success" id="downloadBtn" disabled>
+                        <i class="fas fa-download"></i>
+                        Download Optimized Resume
+                    </button>
+                    <button class="btn btn-secondary" id="compareBtn" disabled>
+                        <i class="fas fa-exchange-alt"></i>
+                        Show Comparison
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison View (Hidden by default) -->
+        <div class="comparison-view" id="comparisonView" style="display: none;">
+            <div class="comparison-column">
+                <div class="column-header">
+                    <div class="column-title">Original Resume</div>
+                    <div class="column-badge badge-original">Before Optimization</div>
+                    <div class="improvement-indicator">
+                        <i class="fas fa-arrow-down"></i>
+                        <span id="originalScore">ATS Score: 0/100</span>
+                    </div>
+                </div>
+                <div class="resume-preview" id="originalResume">
+                    <!-- Original resume content will go here -->
+                </div>
+            </div>
+            
+            <div class="comparison-column">
+                <div class="column-header">
+                    <div class="column-title">Optimized Resume</div>
+                    <div class="column-badge badge-optimized">AI-Enhanced</div>
+                    <div class="improvement-indicator">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="optimizedScore">ATS Score: 0/100</span>
+                    </div>
+                </div>
+                <div class="resume-preview" id="optimizedResume">
+                    <!-- Optimized resume content will go here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Back Button -->
+        <div style="text-align: center; margin: var(--spacing-xl) 0;">
+            <a href="/" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to SparkDeck
+            </a>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="demo-footer">
+            <p>This is a demonstration of the <strong>AI Resume Builder</strong> concept from SparkDeck.</p>
+            <p>The AI optimization is simulated for demonstration purposes.</p>
+            <p>© 2024 SparkDeck | <a href="/">View more startup ideas</a></p>
+        </footer>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <h3>AI Optimizing Your Resume...</h3>
+        <p>Analyzing keywords, skills, and job requirements</p>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Resume optimized successfully!</span>
+    </div>
+
+    <script>
+        // Sample resume data
+        const sampleResume = {
+            name: "Alex Johnson",
+            title: "Frontend Developer",
+            summary: "Experienced frontend developer with 4 years of experience in building web applications using React and JavaScript. Passionate about creating responsive and user-friendly interfaces.",
+            experience: {
+                title: "Frontend Developer",
+                company: "Tech Solutions Inc.",
+                period: "2020 - Present",
+                description: "Developed and maintained multiple web applications using React.js. Collaborated with backend developers to integrate RESTful APIs. Implemented responsive designs and optimized application performance."
+            },
+            skills: "JavaScript, React, HTML5, CSS3, Git, REST APIs",
+            atsScore: 65,
+            keywordMatch: 60,
+            skillsMatch: 70
+        };
+        
+        const optimizedResume = {
+            name: "Alex Johnson",
+            title: "Senior Frontend Developer",
+            summary: "Senior Frontend Developer with 5+ years of expertise in React, TypeScript, and modern web development practices. Proven track record of building scalable, high-performance web applications. Strong experience with state management (Redux, Context API) and testing frameworks (Jest, React Testing Library).",
+            experience: {
+                title: "Senior Frontend Developer",
+                company: "Tech Solutions Inc.",
+                period: "2020 - Present",
+                description: "Led development of multiple scalable web applications using React.js and TypeScript. Implemented Redux for state management and Jest/React Testing Library for comprehensive testing. Optimized application performance, reducing load times by 40%. Collaborated with cross-functional teams in Agile environment to deliver features. Integrated with RESTful APIs and implemented CI/CD pipelines."
+            },
+            skills: "React, TypeScript, JavaScript ES6+, HTML5, CSS3, Git, REST APIs, Redux, Jest, React Testing Library, Agile Methodologies, Next.js, Webpack, AWS",
+            atsScore: 92,
+            keywordMatch: 95,
+            skillsMatch: 90
+        };
+        
+        // Job description keywords
+        const jobKeywords = [
+            "React", "TypeScript", "JavaScript", "HTML5", "CSS3", "Git", 
+            "REST APIs", "Redux", "Jest", "Testing", "Agile", "Next.js", 
+            "GraphQL", "Webpack", "CI/CD", "AWS", "Performance", "Scalable"
+        ];
+        
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const resumeUpload = document.getElementById('resumeUpload');
+        const fileName = document.getElementById('fileName');
+        const manualResume = document.getElementById('manualResume');
+        const jobTitle = document.getElementById('jobTitle');
+        const jobDescription = document.getElementById('jobDescription');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loadSampleBtn = document.getElementById('loadSampleBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const compareBtn = document.getElementById('compareBtn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        
+        // Results elements
+        const atsScore = document.getElementById('atsScore');
+        const atsDescription = document.getElementById('atsDescription');
+        const keywordScore = document.getElementById('keywordScore');
+        const keywordDescription = document.getElementById('keywordDescription');
+        const keywordMatch = document.getElementById('keywordMatch');
+        const skillsScore = document.getElementById('skillsScore');
+        const skillsDescription = document.getElementById('skillsDescription');
+        
+        // Preview elements
+        const previewName = document.getElementById('previewName');
+        const previewTitle = document.getElementById('previewTitle');
+        const previewSummary = document.getElementById('previewSummary');
+        const previewJobTitle = document.getElementById('previewJobTitle');
+        const previewJobDetails = document.getElementById('previewJobDetails');
+        const previewJobDescription = document.getElementById('previewJobDescription');
+        const previewSkills = document.getElementById('previewSkills');
+        
+        // Comparison elements
+        const comparisonView = document.getElementById('comparisonView');
+        const originalResume = document.getElementById('originalResume');
+        const optimizedResumeElem = document.getElementById('optimizedResume');
+        const originalScore = document.getElementById('originalScore');
+        const optimizedScore = document.getElementById('optimizedScore');
+        
+        // State
+        let currentResume = null;
+        let isOptimized = false;
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load sample data on page load for demo purposes
+            loadSampleData();
+            
+            // Set up event listeners
+            uploadArea.addEventListener('click', () => resumeUpload.click());
+            resumeUpload.addEventListener('change', handleFileUpload);
+            analyzeBtn.addEventListener('click', analyzeResume);
+            loadSampleBtn.addEventListener('click', loadSampleData);
+            downloadBtn.addEventListener('click', downloadResume);
+            compareBtn.addEventListener('click', toggleComparison);
+            
+            // Initialize keyword display
+            updateKeywordDisplay(jobKeywords, []);
+        });
+        
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                fileName.textContent = `Selected: ${file.name}`;
+                
+                // Simulate reading file content
+                setTimeout(() => {
+                    showToast(`Resume "${file.name}" uploaded successfully`);
+                    loadSampleData(); // For demo, load sample data
+                }, 500);
+            }
+        }
+        
+        function loadSampleData() {
+            // Load sample resume data
+            currentResume = {...sampleResume};
+            isOptimized = false;
+            
+            // Update preview
+            updateResumePreview(currentResume);
+            
+            // Update results
+            updateOptimizationResults(currentResume);
+            
+            // Enable buttons
+            downloadBtn.disabled = false;
+            compareBtn.disabled = false;
+            
+            showToast("Sample resume loaded successfully");
+        }
+        
+        function analyzeResume() {
+            // Show loading overlay
+            loadingOverlay.classList.add('active');
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                // Hide loading overlay
+                loadingOverlay.classList.remove('active');
+                
+                // Set optimized resume
+                currentResume = {...optimizedResume};
+                isOptimized = true;
+                
+                // Update preview with optimized resume
+                updateResumePreview(currentResume);
+                
+                // Update results
+                updateOptimizationResults(currentResume);
+                
+                // Show success message
+                showToast("Resume optimized successfully! ATS score improved by 27 points.");
+            }, 2000);
+        }
+        
+        function updateResumePreview(resume) {
+            previewName.textContent = resume.name;
+            previewTitle.textContent = resume.title;
+            previewSummary.textContent = resume.summary;
+            previewJobTitle.textContent = resume.experience.title;
+            previewJobDetails.textContent = `${resume.experience.company} • ${resume.experience.period}`;
+            previewJobDescription.textContent = resume.experience.description;
+            previewSkills.textContent = resume.skills;
+        }
+        
+        function updateOptimizationResults(resume) {
+            // Update scores
+            atsScore.textContent = `${resume.atsScore}/100`;
+            keywordScore.textContent = `${resume.keywordMatch}%`;
+            skillsScore.textContent = `${resume.skillsMatch}%`;
+            
+            // Update descriptions
+            if (isOptimized) {
+                atsDescription.textContent = "Excellent! Your resume is highly compatible with ATS systems.";
+                keywordDescription.textContent = "Great keyword match! Your resume contains most of the important keywords from the job description.";
+                skillsDescription.textContent = "Strong skills alignment! You have most of the required skills.";
+            } else {
+                atsDescription.textContent = "Good start, but there's room for improvement. The AI can help optimize for better ATS compatibility.";
+                keywordDescription.textContent = "Some keywords are missing. The AI will suggest adding relevant keywords.";
+                skillsDescription.textContent = "Consider adding some of the missing skills mentioned in the job description.";
+            }
+            
+            // Update keyword match display
+            const matchedKeywords = isOptimized ? 
+                jobKeywords : 
+                jobKeywords.filter(kw => 
+                    kw.toLowerCase().includes("react") || 
+                    kw.toLowerCase().includes("javascript") ||
+                    kw.toLowerCase().includes("html") ||
+                    kw.toLowerCase().includes("css") ||
+                    kw.toLowerCase().includes("git") ||
+                    kw.toLowerCase().includes("rest")
+                );
+            
+            updateKeywordDisplay(jobKeywords, matchedKeywords);
+            
+            // Update comparison scores
+            originalScore.textContent = `ATS Score: ${sampleResume.atsScore}/100`;
+            optimizedScore.textContent = `ATS Score: ${optimizedResume.atsScore}/100`;
+        }
+        
+        function updateKeywordDisplay(allKeywords, matchedKeywords) {
+            keywordMatch.innerHTML = '';
+            
+            allKeywords.forEach(keyword => {
+                const isMatched = matchedKeywords.includes(keyword);
+                const keywordElement = document.createElement('div');
+                keywordElement.className = `keyword ${isMatched ? '' : 'missing'}`;
+                keywordElement.textContent = keyword;
+                keywordMatch.appendChild(keywordElement);
+            });
+        }
+        
+        function toggleComparison() {
+            if (comparisonView.style.display === 'none') {
+                // Show comparison
+                comparisonView.style.display = 'grid';
+                compareBtn.innerHTML = '<i class="fas fa-times"></i> Hide Comparison';
+                
+                // Populate comparison resumes
+                originalResume.innerHTML = createResumeHTML(sampleResume);
+                optimizedResumeElem.innerHTML = createResumeHTML(optimizedResume);
+            } else {
+                // Hide comparison
+                comparisonView.style.display = 'none';
+                compareBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> Show Comparison';
+            }
+        }
+        
+        function createResumeHTML(resume) {
+            return `
+                <div class="resume-header">
+                    <div class="resume-name">${resume.name}</div>
+                    <div class="resume-title">${resume.title}</div>
+                </div>
+                
+                <div class="resume-section">
+                    <div class="section-heading">Summary</div>
+                    <div class="resume-item">
+                        <div class="item-description">${resume.summary}</div>
+                    </div>
+                </div>
+                
+                <div class="resume-section">
+                    <div class="section-heading">Experience</div>
+                    <div class="resume-item">
+                        <div class="item-title">${resume.experience.title}</div>
+                        <div class="item-subtitle">${resume.experience.company} • ${resume.experience.period}</div>
+                        <div class="item-description">${resume.experience.description}</div>
+                    </div>
+                </div>
+                
+                <div class="resume-section">
+                    <div class="section-heading">Skills</div>
+                    <div class="resume-item">
+                        <div class="item-description">${resume.skills}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function downloadResume() {
+            // Simulate download
+            showToast("Downloading optimized resume...");
+            
+            // In a real application, this would generate and download a PDF
+            setTimeout(() => {
+                showToast("Resume downloaded successfully!");
+            }, 1500);
+        }
+        
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize with some instructions
+        setTimeout(() => {
+            showToast("Try the AI Resume Builder! Upload a resume or load sample data to get started.");
+        }, 1000);
+    </script>
+</body>
+</html>

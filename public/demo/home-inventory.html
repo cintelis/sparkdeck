@@ -1,0 +1,2464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HomeSafe | Inventory Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --border: #cbd5e1;
+            --card-bg: #ffffff;
+            --success-bg: #d1fae5;
+            --success-text: #065f46;
+            --room-living: #8b5cf6;
+            --room-bedroom: #10b981;
+            --room-kitchen: #f59e0b;
+            --room-bathroom: #3b82f6;
+            --room-office: #ef4444;
+            --room-other: #64748b;
+        }
+        
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.5;
+            font-size: 16px;
+            padding-bottom: 80px; /* Space for bottom nav */
+            overflow-x: hidden;
+        }
+        
+        /* Mobile-first container */
+        .container {
+            max-width: 100%;
+            padding: 0;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            font-size: 1.6rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            background: white;
+            padding: 15px 16px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .stats-bar::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 15px;
+            border-right: 1px solid var(--border);
+            min-width: 100px;
+        }
+        
+        .stat-item:last-child {
+            border-right: none;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid var(--border);
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray);
+            font-size: 0.8rem;
+            flex: 1;
+            padding: 8px 0;
+        }
+        
+        .nav-item i {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        /* Main Content */
+        .view {
+            display: none;
+            padding: 16px;
+        }
+        
+        .view.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .section-title i {
+            color: var(--primary);
+        }
+        
+        /* Rooms Grid */
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        @media (min-width: 768px) {
+            .rooms-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .room-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--dark);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .room-card.living-room {
+            border-color: var(--room-living);
+        }
+        
+        .room-card.bedroom {
+            border-color: var(--room-bedroom);
+        }
+        
+        .room-card.kitchen {
+            border-color: var(--room-kitchen);
+        }
+        
+        .room-card.bathroom {
+            border-color: var(--room-bathroom);
+        }
+        
+        .room-card.office {
+            border-color: var(--room-office);
+        }
+        
+        .room-card.other {
+            border-color: var(--room-other);
+        }
+        
+        .room-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .living-room .room-icon {
+            background-color: var(--room-living);
+        }
+        
+        .bedroom .room-icon {
+            background-color: var(--room-bedroom);
+        }
+        
+        .kitchen .room-icon {
+            background-color: var(--room-kitchen);
+        }
+        
+        .bathroom .room-icon {
+            background-color: var(--room-bathroom);
+        }
+        
+        .office .room-icon {
+            background-color: var(--room-office);
+        }
+        
+        .other .room-icon {
+            background-color: var(--room-other);
+        }
+        
+        .room-name {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .room-count {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* Items List */
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .item-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .item-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            object-fit: cover;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            font-size: 1.5rem;
+        }
+        
+        .item-details {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .item-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .item-value {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .action-btn:hover {
+            color: var(--primary);
+        }
+        
+        /* Forms */
+        .form-container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border 0.3s;
+            background-color: white;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary);
+        }
+        
+        .file-upload i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .file-upload p {
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .upload-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .remove-file {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary);
+        }
+        
+        .btn-success:hover {
+            background-color: #0da271;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn-small {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            width: auto;
+        }
+        
+        /* Insurance Report */
+        .report-preview {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .report-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .report-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .report-summary {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+        
+        .summary-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .report-room {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+        
+        .room-title {
+            font-size: 1.3rem;
+            color: var(--dark);
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .report-items {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .report-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border);
+            align-items: center;
+        }
+        
+        .report-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-col {
+            padding: 0 5px;
+        }
+        
+        .item-col.value {
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray);
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--light-gray);
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 90%;
+            animation: toastSlideUp 0.3s;
+        }
+        
+        @keyframes toastSlideUp {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        .toast i {
+            font-size: 1.2rem;
+        }
+        
+        .toast.success i {
+            color: var(--secondary);
+        }
+        
+        .toast.error i {
+            color: var(--danger);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* PDF Generation Overlay */
+        .pdf-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .pdf-overlay.active {
+            display: flex;
+        }
+        
+        .pdf-overlay i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .pdf-overlay h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Responsive Tweaks */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 768px;
+                margin: 0 auto;
+            }
+            
+            .mobile-nav {
+                display: none;
+            }
+            
+            body {
+                padding-bottom: 0;
+            }
+            
+            .desktop-nav {
+                display: flex;
+            }
+        }
+        
+        /* Print Styles for PDF */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .report-preview, .report-preview * {
+                visibility: visible;
+            }
+            
+            .report-preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+            }
+            
+            .btn, .mobile-nav, header {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-home-shield"></i>
+                    <span>HomeSafe</span>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" id="syncBtn" title="Sync to Cloud">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </button>
+                    <button class="icon-btn" id="settingsBtn" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value" id="totalItems">0</span>
+                <span class="stat-label">Items</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalValue">$0</span>
+                <span class="stat-label">Total Value</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="totalRooms">0</span>
+                <span class="stat-label">Rooms</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="withReceipts">0</span>
+                <span class="stat-label">With Receipts</span>
+            </div>
+        </div>
+        
+        <!-- Main Views -->
+        <div class="view active" id="dashboardView">
+            <h2 class="section-title">Home Inventory</h2>
+            <p style="color: var(--gray); margin-bottom: 20px;">Tap a room to view or add items</p>
+            
+            <div class="rooms-grid" id="roomsGrid">
+                <!-- Rooms will be populated by JavaScript -->
+            </div>
+            
+            <div class="form-container">
+                <h3 style="margin-bottom: 15px; color: var(--dark);">Quick Add Item</h3>
+                <form id="quickAddForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quickItemName">Item Name</label>
+                            <input type="text" id="quickItemName" placeholder="e.g., Television" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quickItemRoom">Room</label>
+                            <select id="quickItemRoom" required>
+                                <option value="">Select room</option>
+                                <!-- Rooms will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quickItemValue">Value ($)</label>
+                            <input type="number" id="quickItemValue" placeholder="0.00" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quickItemCategory">Category</label>
+                            <select id="quickItemCategory" required>
+                                <option value="">Select category</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="furniture">Furniture</option>
+                                <option value="appliances">Appliances</option>
+                                <option value="jewelry">Jewelry</option>
+                                <option value="clothing">Clothing</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                </form>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <button class="btn btn-success" id="generateReportBtn">
+                    <i class="fas fa-file-pdf"></i> Generate Insurance Report
+                </button>
+            </div>
+        </div>
+        
+        <!-- Room Items View -->
+        <div class="view" id="roomView">
+            <div class="section-title">
+                <button class="icon-btn" id="backToDashboard" style="background: none; color: var(--dark); font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span id="roomTitle">Room Items</span>
+                <button class="btn btn-small" id="addItemToRoomBtn">
+                    <i class="fas fa-plus"></i> Add
+                </button>
+            </div>
+            
+            <div class="items-list" id="roomItemsList">
+                <!-- Items will be populated by JavaScript -->
+            </div>
+            
+            <div class="empty-state" id="roomEmptyState" style="display: none;">
+                <i class="fas fa-box-open"></i>
+                <h3>No items in this room</h3>
+                <p>Add your first item to get started</p>
+                <button class="btn" id="addFirstItemBtn">
+                    <i class="fas fa-plus"></i> Add First Item
+                </button>
+            </div>
+        </div>
+        
+        <!-- Add/Edit Item View -->
+        <div class="view" id="itemFormView">
+            <div class="section-title">
+                <button class="icon-btn" id="backToRoom" style="background: none; color: var(--dark); font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span id="formTitle">Add Item</span>
+                <span></span>
+            </div>
+            
+            <div class="form-container">
+                <form id="itemForm">
+                    <input type="hidden" id="itemId">
+                    
+                    <div class="form-group">
+                        <label for="itemName">Item Name *</label>
+                        <input type="text" id="itemName" placeholder="e.g., 55-inch Samsung TV" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemRoom">Room *</label>
+                            <select id="itemRoom" required>
+                                <option value="">Select room</option>
+                                <!-- Rooms will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemCategory">Category *</label>
+                            <select id="itemCategory" required>
+                                <option value="">Select category</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="furniture">Furniture</option>
+                                <option value="appliances">Appliances</option>
+                                <option value="jewelry">Jewelry</option>
+                                <option value="clothing">Clothing</option>
+                                <option value="documents">Documents</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemPurchaseDate">Purchase Date</label>
+                            <input type="date" id="itemPurchaseDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="itemPurchasePrice">Purchase Price ($)</label>
+                            <input type="number" id="itemPurchasePrice" placeholder="0.00" min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemCurrentValue">Current Value ($) *</label>
+                            <input type="number" id="itemCurrentValue" placeholder="0.00" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemCondition">Condition</label>
+                            <select id="itemCondition">
+                                <option value="">Select condition</option>
+                                <option value="new">New</option>
+                                <option value="excellent">Excellent</option>
+                                <option value="good">Good</option>
+                                <option value="fair">Fair</option>
+                                <option value="poor">Poor</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemDescription">Description</label>
+                        <textarea id="itemDescription" rows="3" placeholder="Additional details about the item..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Item Photo</label>
+                        <div class="file-upload" id="photoUpload">
+                            <i class="fas fa-camera"></i>
+                            <p>Tap to add a photo</p>
+                            <span style="font-size: 0.9rem; color: var(--gray);">JPG, PNG up to 5MB</span>
+                            <input type="file" id="itemPhoto" accept="image/*" capture="environment">
+                        </div>
+                        <div class="upload-preview" id="photoPreview">
+                            <!-- Photo preview will be shown here -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Receipt (Optional)</label>
+                        <div class="file-upload" id="receiptUpload">
+                            <i class="fas fa-receipt"></i>
+                            <p>Tap to add a receipt</p>
+                            <span style="font-size: 0.9rem; color: var(--gray);">JPG, PNG, PDF up to 10MB</span>
+                            <input type="file" id="itemReceipt" accept="image/*,.pdf">
+                        </div>
+                        <div class="upload-preview" id="receiptPreview">
+                            <!-- Receipt preview will be shown here -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemSerialNumber">Serial Number / Model</label>
+                        <input type="text" id="itemSerialNumber" placeholder="e.g., SN123456789">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemNotes">Insurance Notes</label>
+                        <textarea id="itemNotes" rows="2" placeholder="Any notes for insurance purposes..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="saveItemBtn">
+                        <i class="fas fa-save"></i> Save Item
+                    </button>
+                    
+                    <button type="button" class="btn btn-danger" id="deleteItemBtn" style="margin-top: 15px; display: none;">
+                        <i class="fas fa-trash"></i> Delete Item
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Report View -->
+        <div class="view" id="reportView">
+            <div class="section-title">
+                <button class="icon-btn" id="backToDashboardFromReport" style="background: none; color: var(--dark); font-size: 1.5rem; padding: 0;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <span>Insurance Report</span>
+                <button class="btn btn-small" id="downloadPdfBtn">
+                    <i class="fas fa-download"></i> PDF
+                </button>
+            </div>
+            
+            <div class="report-preview" id="reportPreview">
+                <div class="report-header">
+                    <h1 class="report-title">Home Inventory Report</h1>
+                    <p>For insurance purposes - Generated on <span id="reportDate"></span></p>
+                </div>
+                
+                <div class="report-meta">
+                    <div>
+                        <strong>Property Address:</strong><br>
+                        <span id="propertyAddress">123 Main St, Anytown, USA</span>
+                    </div>
+                    <div>
+                        <strong>Policy Holder:</strong><br>
+                        <span id="policyHolder">John Smith</span>
+                    </div>
+                </div>
+                
+                <div class="report-summary">
+                    <h3 style="margin-bottom: 15px; color: var(--dark);">Inventory Summary</h3>
+                    <div class="summary-grid" id="reportSummary">
+                        <!-- Summary stats will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div id="reportRooms">
+                    <!-- Rooms and items will be populated by JavaScript -->
+                </div>
+                
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid var(--border);">
+                    <p><strong>Important Notes:</strong></p>
+                    <ul style="padding-left: 20px; margin-top: 10px; color: var(--gray);">
+                        <li>This report is for insurance documentation purposes only.</li>
+                        <li>Values are estimated current market values, not necessarily purchase prices.</li>
+                        <li>Keep this document with your insurance policy paperwork.</li>
+                        <li>Update this inventory regularly, especially after major purchases.</li>
+                    </ul>
+                    <p style="margin-top: 20px; text-align: center; font-style: italic; color: var(--gray);">
+                        Generated by HomeSafe Inventory Manager
+                    </p>
+                </div>
+            </div>
+            
+            <div class="empty-state" id="reportEmptyState" style="display: none;">
+                <i class="fas fa-file-alt"></i>
+                <h3>No items to report</h3>
+                <p>Add items to your inventory first to generate a report</p>
+                <button class="btn" id="addItemsForReportBtn">
+                    <i class="fas fa-plus"></i> Add Items
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <nav class="mobile-nav">
+            <a href="#" class="nav-item active" data-view="dashboardView">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item" data-view="roomView" id="mobileRoomNav">
+                <i class="fas fa-couch"></i>
+                <span>Rooms</span>
+            </a>
+            <a href="#" class="nav-item" data-view="itemFormView" id="mobileAddNav">
+                <i class="fas fa-plus-circle"></i>
+                <span>Add</span>
+            </a>
+            <a href="#" class="nav-item" data-view="reportView">
+                <i class="fas fa-file-pdf"></i>
+                <span>Report</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Settings</h3>
+                <button class="modal-close" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="userName">Your Name</label>
+                    <input type="text" id="userName" placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label for="propertyAddressInput">Property Address</label>
+                    <textarea id="propertyAddressInput" rows="3" placeholder="Enter your property address for insurance reports"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="insuranceCompany">Insurance Company</label>
+                    <input type="text" id="insuranceCompany" placeholder="e.g., State Farm, Allstate">
+                </div>
+                <div class="form-group">
+                    <label for="policyNumber">Policy Number</label>
+                    <input type="text" id="policyNumber" placeholder="Enter your policy number">
+                </div>
+                <div class="checkbox-group" style="margin: 20px 0;">
+                    <input type="checkbox" id="autoBackup" checked>
+                    <label for="autoBackup">Auto-backup to cloud</label>
+                </div>
+                <button class="btn" id="saveSettingsBtn">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+                <button class="btn btn-outline" id="exportDataBtn" style="margin-top: 15px;">
+                    <i class="fas fa-download"></i> Export All Data
+                </button>
+                <button class="btn btn-outline btn-danger" id="clearDataBtn" style="margin-top: 15px;">
+                    <i class="fas fa-trash"></i> Clear All Data
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PDF Generation Overlay -->
+    <div class="pdf-overlay" id="pdfOverlay">
+        <i class="fas fa-file-pdf"></i>
+        <h3>Generating PDF Report</h3>
+        <p>Please wait...</p>
+        <div class="spinner" style="margin-top: 20px;"></div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" style="display: none;">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Item saved successfully!</span>
+    </div>
+
+    <script>
+        // Home Inventory Manager Application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the application
+            initApp();
+            
+            // Navigation functionality
+            setupNavigation();
+            
+            // Form handling
+            setupForms();
+            
+            // File upload handling
+            setupFileUploads();
+            
+            // Event listeners for buttons
+            setupEventListeners();
+        });
+        
+        // Sample data structure
+        let inventoryData = {
+            settings: {
+                userName: "John Smith",
+                propertyAddress: "123 Main St, Anytown, USA 12345",
+                insuranceCompany: "State Farm",
+                policyNumber: "SF-789456123",
+                autoBackup: true
+            },
+            rooms: [
+                { id: 1, name: "Living Room", icon: "couch", color: "living-room", itemCount: 0, totalValue: 0 },
+                { id: 2, name: "Bedroom", icon: "bed", color: "bedroom", itemCount: 0, totalValue: 0 },
+                { id: 3, name: "Kitchen", icon: "utensils", color: "kitchen", itemCount: 0, totalValue: 0 },
+                { id: 4, name: "Bathroom", icon: "bath", color: "bathroom", itemCount: 0, totalValue: 0 },
+                { id: 5, name: "Home Office", icon: "laptop", color: "office", itemCount: 0, totalValue: 0 },
+                { id: 6, name: "Garage", icon: "car", color: "other", itemCount: 0, totalValue: 0 },
+                { id: 7, name: "Basement", icon: "box", color: "other", itemCount: 0, totalValue: 0 }
+            ],
+            items: [],
+            nextItemId: 1
+        };
+        
+        // Current state
+        let currentRoomId = null;
+        let currentItemId = null;
+        let editingItem = false;
+        
+        // Initialize the app
+        function initApp() {
+            // Load data from localStorage
+            loadData();
+            
+            // Populate rooms
+            renderRooms();
+            
+            // Populate room dropdowns
+            populateRoomDropdowns();
+            
+            // Update statistics
+            updateStatistics();
+            
+            // Set report date
+            document.getElementById('reportDate').textContent = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Set initial property address and policy holder
+            document.getElementById('propertyAddress').textContent = inventoryData.settings.propertyAddress;
+            document.getElementById('policyHolder').textContent = inventoryData.settings.userName;
+            
+            // Load settings into modal
+            loadSettings();
+        }
+        
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('homeInventoryData');
+            if (savedData) {
+                try {
+                    inventoryData = JSON.parse(savedData);
+                    console.log('Data loaded from localStorage');
+                } catch (e) {
+                    console.error('Error parsing saved data:', e);
+                }
+            }
+        }
+        
+        // Save data to localStorage
+        function saveData() {
+            try {
+                localStorage.setItem('homeInventoryData', JSON.stringify(inventoryData));
+                console.log('Data saved to localStorage');
+            } catch (e) {
+                console.error('Error saving data:', e);
+                showToast('Error saving data', 'error');
+            }
+        }
+        
+        // Render rooms on dashboard
+        function renderRooms() {
+            const roomsGrid = document.getElementById('roomsGrid');
+            roomsGrid.innerHTML = '';
+            
+            inventoryData.rooms.forEach(room => {
+                const roomCard = document.createElement('a');
+                roomCard.href = '#';
+                roomCard.className = `room-card ${room.color}`;
+                roomCard.dataset.roomId = room.id;
+                
+                roomCard.innerHTML = `
+                    <div class="room-icon">
+                        <i class="fas fa-${room.icon}"></i>
+                    </div>
+                    <div class="room-name">${room.name}</div>
+                    <div class="room-count">${room.itemCount} items • $${room.totalValue.toLocaleString()}</div>
+                `;
+                
+                roomCard.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openRoom(room.id);
+                });
+                
+                roomsGrid.appendChild(roomCard);
+            });
+        }
+        
+        // Populate room dropdowns in forms
+        function populateRoomDropdowns() {
+            const roomSelects = [
+                document.getElementById('quickItemRoom'),
+                document.getElementById('itemRoom')
+            ];
+            
+            roomSelects.forEach(select => {
+                if (!select) return;
+                
+                // Clear existing options except the first one
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+                
+                // Add room options
+                inventoryData.rooms.forEach(room => {
+                    const option = document.createElement('option');
+                    option.value = room.id;
+                    option.textContent = room.name;
+                    select.appendChild(option);
+                });
+            });
+        }
+        
+        // Open a room to view its items
+        function openRoom(roomId) {
+            currentRoomId = roomId;
+            const room = inventoryData.rooms.find(r => r.id === roomId);
+            
+            if (!room) return;
+            
+            // Update room title
+            document.getElementById('roomTitle').textContent = room.name;
+            
+            // Switch to room view
+            switchView('roomView');
+            
+            // Update mobile nav
+            updateMobileNav('roomView');
+            
+            // Render room items
+            renderRoomItems(roomId);
+        }
+        
+        // Render items in a room
+        function renderRoomItems(roomId) {
+            const itemsList = document.getElementById('roomItemsList');
+            const emptyState = document.getElementById('roomEmptyState');
+            
+            // Filter items for this room
+            const roomItems = inventoryData.items.filter(item => item.roomId === roomId);
+            
+            if (roomItems.length === 0) {
+                itemsList.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            itemsList.style.display = 'flex';
+            emptyState.style.display = 'none';
+            itemsList.innerHTML = '';
+            
+            // Sort items by value (highest first)
+            roomItems.sort((a, b) => b.currentValue - a.currentValue);
+            
+            roomItems.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'item-card';
+                
+                // Get room name
+                const room = inventoryData.rooms.find(r => r.id === item.roomId);
+                const roomName = room ? room.name : 'Unknown Room';
+                
+                // Format purchase date
+                let purchaseDate = '';
+                if (item.purchaseDate) {
+                    const date = new Date(item.purchaseDate);
+                    purchaseDate = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                }
+                
+                // Determine if item has photo or receipt
+                const hasPhoto = item.photo && item.photo !== '';
+                const hasReceipt = item.receipt && item.receipt !== '';
+                
+                itemCard.innerHTML = `
+                    <div class="item-image">
+                        ${hasPhoto ? 
+                            `<img src="${item.photo}" alt="${item.name}" style="width: 100%; height: 100%; border-radius: 8px;">` : 
+                            `<i class="fas fa-${getCategoryIcon(item.category)}"></i>`
+                        }
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-info">
+                            <span>${roomName}</span>
+                            ${purchaseDate ? `<span>• ${purchaseDate}</span>` : ''}
+                            ${item.category ? `<span>• ${item.category}</span>` : ''}
+                            ${hasReceipt ? `<span>• <i class="fas fa-receipt" style="color: var(--secondary);"></i></span>` : ''}
+                        </div>
+                        <div class="item-value">$${item.currentValue.toLocaleString()}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn edit-item" data-item-id="${item.id}" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-item" data-item-id="${item.id}" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                itemsList.appendChild(itemCard);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.edit-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = parseInt(this.dataset.itemId);
+                    editItem(itemId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const itemId = parseInt(this.dataset.itemId);
+                    deleteItem(itemId);
+                });
+            });
+        }
+        
+        // Get icon for category
+        function getCategoryIcon(category) {
+            switch(category) {
+                case 'electronics': return 'tv';
+                case 'furniture': return 'couch';
+                case 'appliances': return 'blender';
+                case 'jewelry': return 'gem';
+                case 'clothing': return 'tshirt';
+                case 'documents': return 'file-alt';
+                default: return 'box';
+            }
+        }
+        
+        // Open item form for editing
+        function editItem(itemId) {
+            const item = inventoryData.items.find(i => i.id === itemId);
+            if (!item) return;
+            
+            currentItemId = itemId;
+            editingItem = true;
+            
+            // Set form title
+            document.getElementById('formTitle').textContent = 'Edit Item';
+            
+            // Populate form fields
+            document.getElementById('itemId').value = item.id;
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemRoom').value = item.roomId;
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('itemPurchaseDate').value = item.purchaseDate || '';
+            document.getElementById('itemPurchasePrice').value = item.purchasePrice || '';
+            document.getElementById('itemCurrentValue').value = item.currentValue;
+            document.getElementById('itemCondition').value = item.condition || '';
+            document.getElementById('itemDescription').value = item.description || '';
+            document.getElementById('itemSerialNumber').value = item.serialNumber || '';
+            document.getElementById('itemNotes').value = item.notes || '';
+            
+            // Show delete button
+            document.getElementById('deleteItemBtn').style.display = 'block';
+            
+            // Show photo preview if exists
+            const photoPreview = document.getElementById('photoPreview');
+            photoPreview.innerHTML = '';
+            
+            if (item.photo && item.photo !== '') {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                previewItem.innerHTML = `
+                    <img src="${item.photo}" alt="Item photo">
+                    <button type="button" class="remove-file" data-type="photo">×</button>
+                `;
+                photoPreview.appendChild(previewItem);
+            }
+            
+            // Show receipt preview if exists
+            const receiptPreview = document.getElementById('receiptPreview');
+            receiptPreview.innerHTML = '';
+            
+            if (item.receipt && item.receipt !== '') {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                
+                // Check if receipt is PDF or image
+                if (item.receipt.includes('.pdf')) {
+                    previewItem.innerHTML = `
+                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--light-gray);">
+                            <i class="fas fa-file-pdf" style="font-size: 2rem; color: var(--danger);"></i>
+                        </div>
+                        <button type="button" class="remove-file" data-type="receipt">×</button>
+                    `;
+                } else {
+                    previewItem.innerHTML = `
+                        <img src="${item.receipt}" alt="Receipt">
+                        <button type="button" class="remove-file" data-type="receipt">×</button>
+                    `;
+                }
+                
+                receiptPreview.appendChild(previewItem);
+            }
+            
+            // Switch to item form view
+            switchView('itemFormView');
+            updateMobileNav('itemFormView');
+        }
+        
+        // Open empty item form for adding
+        function openItemForm(roomId = null) {
+            currentItemId = null;
+            editingItem = false;
+            
+            // Reset form
+            document.getElementById('itemForm').reset();
+            document.getElementById('photoPreview').innerHTML = '';
+            document.getElementById('receiptPreview').innerHTML = '';
+            document.getElementById('deleteItemBtn').style.display = 'none';
+            document.getElementById('formTitle').textContent = 'Add Item';
+            
+            // Set room if specified
+            if (roomId) {
+                document.getElementById('itemRoom').value = roomId;
+            }
+            
+            // Switch to item form view
+            switchView('itemFormView');
+            updateMobileNav('itemFormView');
+        }
+        
+        // Delete an item
+        function deleteItem(itemId) {
+            if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                return;
+            }
+            
+            // Find item index
+            const itemIndex = inventoryData.items.findIndex(i => i.id === itemId);
+            if (itemIndex === -1) return;
+            
+            const item = inventoryData.items[itemIndex];
+            
+            // Update room stats
+            const room = inventoryData.rooms.find(r => r.id === item.roomId);
+            if (room) {
+                room.itemCount -= 1;
+                room.totalValue -= item.currentValue;
+            }
+            
+            // Remove item
+            inventoryData.items.splice(itemIndex, 1);
+            
+            // Save data
+            saveData();
+            
+            // Update UI
+            updateStatistics();
+            renderRooms();
+            
+            // If we're in a room view, update it
+            if (currentRoomId) {
+                renderRoomItems(currentRoomId);
+            }
+            
+            // If we're editing this item, go back
+            if (editingItem && currentItemId === itemId) {
+                if (currentRoomId) {
+                    switchView('roomView');
+                } else {
+                    switchView('dashboardView');
+                }
+            }
+            
+            showToast('Item deleted successfully', 'success');
+        }
+        
+        // Update statistics
+        function updateStatistics() {
+            // Calculate totals
+            let totalItems = inventoryData.items.length;
+            let totalValue = 0;
+            let itemsWithReceipts = 0;
+            
+            inventoryData.items.forEach(item => {
+                totalValue += item.currentValue;
+                if (item.receipt && item.receipt !== '') {
+                    itemsWithReceipts++;
+                }
+            });
+            
+            // Count rooms with items
+            let roomsWithItems = inventoryData.rooms.filter(room => room.itemCount > 0).length;
+            
+            // Update UI
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('totalValue').textContent = '$' + totalValue.toLocaleString();
+            document.getElementById('totalRooms').textContent = roomsWithItems;
+            document.getElementById('withReceipts').textContent = itemsWithReceipts;
+        }
+        
+        // Switch between views
+        function switchView(viewId) {
+            // Hide all views
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+            
+            // Show the requested view
+            document.getElementById(viewId).classList.add('active');
+            
+            // Update mobile nav
+            updateMobileNav(viewId);
+        }
+        
+        // Update mobile navigation active state
+        function updateMobileNav(viewId) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                
+                // Check if this nav item corresponds to the current view
+                const targetView = item.getAttribute('data-view');
+                if (targetView === viewId) {
+                    item.classList.add('active');
+                }
+            });
+        }
+        
+        // Setup navigation
+        function setupNavigation() {
+            // Mobile nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const viewId = this.getAttribute('data-view');
+                    switchView(viewId);
+                    
+                    // Special handling for add view
+                    if (viewId === 'itemFormView') {
+                        openItemForm();
+                    }
+                });
+            });
+            
+            // Back buttons
+            document.getElementById('backToDashboard').addEventListener('click', function() {
+                switchView('dashboardView');
+            });
+            
+            document.getElementById('backToRoom').addEventListener('click', function() {
+                if (currentRoomId) {
+                    switchView('roomView');
+                } else {
+                    switchView('dashboardView');
+                }
+            });
+            
+            document.getElementById('backToDashboardFromReport').addEventListener('click', function() {
+                switchView('dashboardView');
+            });
+            
+            // Add item to room button
+            document.getElementById('addItemToRoomBtn').addEventListener('click', function() {
+                openItemForm(currentRoomId);
+            });
+            
+            // Add first item button
+            document.getElementById('addFirstItemBtn').addEventListener('click', function() {
+                openItemForm(currentRoomId);
+            });
+            
+            // Add items for report button
+            document.getElementById('addItemsForReportBtn').addEventListener('click', function() {
+                switchView('dashboardView');
+            });
+        }
+        
+        // Setup forms
+        function setupForms() {
+            // Quick add form
+            document.getElementById('quickAddForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const name = document.getElementById('quickItemName').value;
+                const roomId = parseInt(document.getElementById('quickItemRoom').value);
+                const category = document.getElementById('quickItemCategory').value;
+                const value = parseFloat(document.getElementById('quickItemValue').value) || 0;
+                
+                // Create item
+                const item = {
+                    id: inventoryData.nextItemId++,
+                    name: name,
+                    roomId: roomId,
+                    category: category,
+                    currentValue: value,
+                    purchaseDate: null,
+                    purchasePrice: null,
+                    condition: '',
+                    description: '',
+                    photo: '',
+                    receipt: '',
+                    serialNumber: '',
+                    notes: '',
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Add to inventory
+                inventoryData.items.push(item);
+                
+                // Update room stats
+                const room = inventoryData.rooms.find(r => r.id === roomId);
+                if (room) {
+                    room.itemCount += 1;
+                    room.totalValue += value;
+                }
+                
+                // Save data
+                saveData();
+                
+                // Update UI
+                updateStatistics();
+                renderRooms();
+                
+                // Reset form
+                this.reset();
+                
+                showToast('Item added successfully', 'success');
+            });
+            
+            // Full item form
+            document.getElementById('itemForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveItem();
+            });
+            
+            // Delete item button
+            document.getElementById('deleteItemBtn').addEventListener('click', function() {
+                if (currentItemId) {
+                    deleteItem(currentItemId);
+                }
+            });
+        }
+        
+        // Save item from full form
+        function saveItem() {
+            // Get form values
+            const itemId = document.getElementById('itemId').value;
+            const name = document.getElementById('itemName').value;
+            const roomId = parseInt(document.getElementById('itemRoom').value);
+            const category = document.getElementById('itemCategory').value;
+            const purchaseDate = document.getElementById('itemPurchaseDate').value;
+            const purchasePrice = document.getElementById('itemPurchasePrice').value ? 
+                parseFloat(document.getElementById('itemPurchasePrice').value) : null;
+            const currentValue = parseFloat(document.getElementById('itemCurrentValue').value) || 0;
+            const condition = document.getElementById('itemCondition').value;
+            const description = document.getElementById('itemDescription').value;
+            const serialNumber = document.getElementById('itemSerialNumber').value;
+            const notes = document.getElementById('itemNotes').value;
+            
+            // Get photo and receipt data (simulated - in real app these would be file uploads)
+            let photo = '';
+            let receipt = '';
+            
+            const photoPreview = document.getElementById('photoPreview');
+            if (photoPreview.children.length > 0) {
+                // In a real app, this would be a URL to the uploaded image
+                photo = 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80';
+            }
+            
+            const receiptPreview = document.getElementById('receiptPreview');
+            if (receiptPreview.children.length > 0) {
+                // In a real app, this would be a URL to the uploaded receipt
+                receipt = 'receipt.pdf';
+            }
+            
+            let item;
+            
+            if (editingItem && currentItemId) {
+                // Find existing item
+                item = inventoryData.items.find(i => i.id === currentItemId);
+                if (!item) return;
+                
+                // Get old room and value for stats update
+                const oldRoomId = item.roomId;
+                const oldValue = item.currentValue;
+                
+                // Update item properties
+                item.name = name;
+                item.roomId = roomId;
+                item.category = category;
+                item.purchaseDate = purchaseDate || null;
+                item.purchasePrice = purchasePrice;
+                item.currentValue = currentValue;
+                item.condition = condition;
+                item.description = description;
+                item.photo = photo;
+                item.receipt = receipt;
+                item.serialNumber = serialNumber;
+                item.notes = notes;
+                item.updatedAt = new Date().toISOString();
+                
+                // Update room stats if room changed or value changed
+                if (oldRoomId !== roomId || oldValue !== currentValue) {
+                    // Update old room
+                    const oldRoom = inventoryData.rooms.find(r => r.id === oldRoomId);
+                    if (oldRoom) {
+                        oldRoom.itemCount -= 1;
+                        oldRoom.totalValue -= oldValue;
+                    }
+                    
+                    // Update new room
+                    const newRoom = inventoryData.rooms.find(r => r.id === roomId);
+                    if (newRoom) {
+                        newRoom.itemCount += 1;
+                        newRoom.totalValue += currentValue;
+                    }
+                } else if (oldValue !== currentValue) {
+                    // Only value changed, update room total
+                    const room = inventoryData.rooms.find(r => r.id === roomId);
+                    if (room) {
+                        room.totalValue = room.totalValue - oldValue + currentValue;
+                    }
+                }
+            } else {
+                // Create new item
+                item = {
+                    id: inventoryData.nextItemId++,
+                    name: name,
+                    roomId: roomId,
+                    category: category,
+                    purchaseDate: purchaseDate || null,
+                    purchasePrice: purchasePrice,
+                    currentValue: currentValue,
+                    condition: condition,
+                    description: description,
+                    photo: photo,
+                    receipt: receipt,
+                    serialNumber: serialNumber,
+                    notes: notes,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Add to inventory
+                inventoryData.items.push(item);
+                
+                // Update room stats
+                const room = inventoryData.rooms.find(r => r.id === roomId);
+                if (room) {
+                    room.itemCount += 1;
+                    room.totalValue += currentValue;
+                }
+            }
+            
+            // Save data
+            saveData();
+            
+            // Update UI
+            updateStatistics();
+            renderRooms();
+            
+            // If we're in a room view, update it
+            if (currentRoomId) {
+                renderRoomItems(currentRoomId);
+            }
+            
+            // Go back to appropriate view
+            if (currentRoomId) {
+                switchView('roomView');
+            } else {
+                switchView('dashboardView');
+            }
+            
+            showToast(`Item ${editingItem ? 'updated' : 'added'} successfully`, 'success');
+        }
+        
+        // Setup file uploads
+        function setupFileUploads() {
+            // Photo upload
+            document.getElementById('photoUpload').addEventListener('click', function() {
+                document.getElementById('itemPhoto').click();
+            });
+            
+            document.getElementById('itemPhoto').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // Check file type
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file');
+                    return;
+                }
+                
+                // Check file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    return;
+                }
+                
+                // Create preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const photoPreview = document.getElementById('photoPreview');
+                    photoPreview.innerHTML = '';
+                    
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    previewItem.innerHTML = `
+                        <img src="${e.target.result}" alt="Uploaded photo">
+                        <button type="button" class="remove-file" data-type="photo">×</button>
+                    `;
+                    
+                    photoPreview.appendChild(previewItem);
+                    
+                    // Add event listener to remove button
+                    previewItem.querySelector('.remove-file').addEventListener('click', function() {
+                        photoPreview.innerHTML = '';
+                        document.getElementById('itemPhoto').value = '';
+                    });
+                };
+                
+                reader.readAsDataURL(file);
+            });
+            
+            // Receipt upload
+            document.getElementById('receiptUpload').addEventListener('click', function() {
+                document.getElementById('itemReceipt').click();
+            });
+            
+            document.getElementById('itemReceipt').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // Check file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please select a JPG, PNG, or PDF file');
+                    return;
+                }
+                
+                // Check file size (10MB limit)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size must be less than 10MB');
+                    return;
+                }
+                
+                // Create preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const receiptPreview = document.getElementById('receiptPreview');
+                    receiptPreview.innerHTML = '';
+                    
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    
+                    if (file.type === 'application/pdf') {
+                        previewItem.innerHTML = `
+                            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--light-gray);">
+                                <i class="fas fa-file-pdf" style="font-size: 2rem; color: var(--danger);"></i>
+                            </div>
+                            <button type="button" class="remove-file" data-type="receipt">×</button>
+                        `;
+                    } else {
+                        previewItem.innerHTML = `
+                            <img src="${e.target.result}" alt="Uploaded receipt">
+                            <button type="button" class="remove-file" data-type="receipt">×</button>
+                        `;
+                    }
+                    
+                    receiptPreview.appendChild(previewItem);
+                    
+                    // Add event listener to remove button
+                    previewItem.querySelector('.remove-file').addEventListener('click', function() {
+                        receiptPreview.innerHTML = '';
+                        document.getElementById('itemReceipt').value = '';
+                    });
+                };
+                
+                reader.readAsDataURL(file);
+            });
+            
+            // Remove file buttons in preview (for existing files when editing)
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-file')) {
+                    const type = e.target.getAttribute('data-type');
+                    const previewDiv = document.getElementById(`${type}Preview`);
+                    if (previewDiv) {
+                        previewDiv.innerHTML = '';
+                    }
+                }
+            });
+        }
+        
+        // Setup event listeners for buttons
+        function setupEventListeners() {
+            // Generate report button
+            document.getElementById('generateReportBtn').addEventListener('click', function() {
+                generateReport();
+            });
+            
+            // Download PDF button
+            document.getElementById('downloadPdfBtn').addEventListener('click', function() {
+                downloadPdfReport();
+            });
+            
+            // Settings button
+            document.getElementById('settingsBtn').addEventListener('click', function() {
+                document.getElementById('settingsModal').classList.add('active');
+            });
+            
+            // Close settings modal
+            document.getElementById('closeSettingsModal').addEventListener('click', function() {
+                document.getElementById('settingsModal').classList.remove('active');
+            });
+            
+            // Save settings
+            document.getElementById('saveSettingsBtn').addEventListener('click', function() {
+                saveSettings();
+            });
+            
+            // Clear data button
+            document.getElementById('clearDataBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+                    clearAllData();
+                }
+            });
+            
+            // Sync button
+            document.getElementById('syncBtn').addEventListener('click', function() {
+                // Simulate sync
+                const btn = this;
+                const originalIcon = btn.innerHTML;
+                
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalIcon;
+                    btn.disabled = false;
+                    showToast('Data synced to cloud', 'success');
+                }, 1500);
+            });
+        }
+        
+        // Load settings into modal
+        function loadSettings() {
+            document.getElementById('userName').value = inventoryData.settings.userName;
+            document.getElementById('propertyAddressInput').value = inventoryData.settings.propertyAddress;
+            document.getElementById('insuranceCompany').value = inventoryData.settings.insuranceCompany;
+            document.getElementById('policyNumber').value = inventoryData.settings.policyNumber;
+            document.getElementById('autoBackup').checked = inventoryData.settings.autoBackup;
+        }
+        
+        // Save settings
+        function saveSettings() {
+            inventoryData.settings.userName = document.getElementById('userName').value;
+            inventoryData.settings.propertyAddress = document.getElementById('propertyAddressInput').value;
+            inventoryData.settings.insuranceCompany = document.getElementById('insuranceCompany').value;
+            inventoryData.settings.policyNumber = document.getElementById('policyNumber').value;
+            inventoryData.settings.autoBackup = document.getElementById('autoBackup').checked;
+            
+            // Update report display
+            document.getElementById('propertyAddress').textContent = inventoryData.settings.propertyAddress;
+            document.getElementById('policyHolder').textContent = inventoryData.settings.userName;
+            
+            saveData();
+            document.getElementById('settingsModal').classList.remove('active');
+            showToast('Settings saved successfully', 'success');
+        }
+        
+        // Clear all data
+        function clearAllData() {
+            // Reset inventory data
+            inventoryData.items = [];
+            inventoryData.nextItemId = 1;
+            
+            // Reset room counts
+            inventoryData.rooms.forEach(room => {
+                room.itemCount = 0;
+                room.totalValue = 0;
+            });
+            
+            // Save and update UI
+            saveData();
+            updateStatistics();
+            renderRooms();
+            
+            // Close modal
+            document.getElementById('settingsModal').classList.remove('active');
+            
+            // If in room view, go back to dashboard
+            if (document.getElementById('roomView').classList.contains('active')) {
+                switchView('dashboardView');
+            }
+            
+            showToast('All data cleared', 'success');
+        }
+        
+        // Generate report
+        function generateReport() {
+            // Check if there are items
+            if (inventoryData.items.length === 0) {
+                document.getElementById('reportEmptyState').style.display = 'block';
+                document.getElementById('reportPreview').style.display = 'none';
+            } else {
+                document.getElementById('reportEmptyState').style.display = 'none';
+                document.getElementById('reportPreview').style.display = 'block';
+                
+                // Calculate summary
+                let totalItems = inventoryData.items.length;
+                let totalValue = 0;
+                let highValueItems = 0; // Items over $500
+                let itemsWithReceipts = 0;
+                
+                inventoryData.items.forEach(item => {
+                    totalValue += item.currentValue;
+                    if (item.currentValue > 500) highValueItems++;
+                    if (item.receipt && item.receipt !== '') itemsWithReceipts++;
+                });
+                
+                // Update summary
+                const summaryGrid = document.getElementById('reportSummary');
+                summaryGrid.innerHTML = `
+                    <div class="summary-item">
+                        <span class="summary-value">${totalItems}</span>
+                        <span class="summary-label">Total Items</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-value">$${totalValue.toLocaleString()}</span>
+                        <span class="summary-label">Total Value</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-value">${highValueItems}</span>
+                        <span class="summary-label">High-Value Items</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-value">${itemsWithReceipts}</span>
+                        <span class="summary-label">With Receipts</span>
+                    </div>
+                `;
+                
+                // Generate room-by-room report
+                const reportRooms = document.getElementById('reportRooms');
+                reportRooms.innerHTML = '';
+                
+                // Only show rooms with items
+                const roomsWithItems = inventoryData.rooms.filter(room => room.itemCount > 0);
+                
+                roomsWithItems.forEach(room => {
+                    const roomItems = inventoryData.items.filter(item => item.roomId === room.id);
+                    
+                    // Calculate room total
+                    let roomTotal = 0;
+                    roomItems.forEach(item => {
+                        roomTotal += item.currentValue;
+                    });
+                    
+                    const roomSection = document.createElement('div');
+                    roomSection.className = 'report-room';
+                    
+                    let itemsHTML = '';
+                    
+                    // Sort items by value (highest first)
+                    roomItems.sort((a, b) => b.currentValue - a.currentValue);
+                    
+                    roomItems.forEach(item => {
+                        itemsHTML += `
+                            <div class="report-item">
+                                <div class="item-col">${item.name}</div>
+                                <div class="item-col">${item.category} ${item.serialNumber ? `(${item.serialNumber})` : ''}</div>
+                                <div class="item-col value">$${item.currentValue.toLocaleString()}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    roomSection.innerHTML = `
+                        <h3 class="room-title">
+                            <i class="fas fa-${room.icon}" style="color: var(--room-${room.color});"></i>
+                            ${room.name} (${roomItems.length} items, Total: $${roomTotal.toLocaleString()})
+                        </h3>
+                        <div class="report-items">
+                            ${itemsHTML}
+                        </div>
+                    `;
+                    
+                    reportRooms.appendChild(roomSection);
+                });
+            }
+            
+            // Switch to report view
+            switchView('reportView');
+            updateMobileNav('reportView');
+        }
+        
+        // Download PDF report
+        function downloadPdfReport() {
+            // Show overlay
+            document.getElementById('pdfOverlay').classList.add('active');
+            
+            // Use html2canvas to capture the report preview
+            setTimeout(() => {
+                const reportElement = document.getElementById('reportPreview');
+                
+                html2canvas(reportElement, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                }).then(canvas => {
+                    // Create PDF
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    
+                    const imgWidth = 190;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    // Add image to PDF
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, 10, imgWidth, imgHeight);
+                    
+                    // Save PDF
+                    const dateStr = new Date().toISOString().split('T')[0];
+                    pdf.save(`Home-Inventory-Report-${dateStr}.pdf`);
+                    
+                    // Hide overlay
+                    document.getElementById('pdfOverlay').classList.remove('active');
+                    
+                    showToast('PDF report downloaded', 'success');
+                }).catch(error => {
+                    console.error('Error generating PDF:', error);
+                    document.getElementById('pdfOverlay').classList.remove('active');
+                    showToast('Error generating PDF', 'error');
+                });
+            }, 500);
+        }
+        
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            // Set message and type
+            toastMessage.textContent = message;
+            toast.className = 'toast ' + type;
+            
+            // Show toast
+            toast.style.display = 'flex';
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Add some sample data for demo
+        function addSampleData() {
+            // Only add if no items exist
+            if (inventoryData.items.length > 0) return;
+            
+            const sampleItems = [
+                {
+                    id: 1,
+                    name: "55-inch Samsung TV",
+                    roomId: 1,
+                    category: "electronics",
+                    purchaseDate: "2022-11-15",
+                    purchasePrice: 799.99,
+                    currentValue: 650.00,
+                    condition: "excellent",
+                    description: "4K Smart TV with HDR",
+                    photo: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    receipt: "receipt.pdf",
+                    serialNumber: "SN-TV-789456123",
+                    notes: "Still under manufacturer warranty until Nov 2024"
+                },
+                {
+                    id: 2,
+                    name: "Leather Sofa",
+                    roomId: 1,
+                    category: "furniture",
+                    purchaseDate: "2021-08-20",
+                    purchasePrice: 1200.00,
+                    currentValue: 900.00,
+                    condition: "good",
+                    description: "3-seater brown leather sofa",
+                    photo: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    receipt: "",
+                    serialNumber: "",
+                    notes: "Minor wear on left arm"
+                },
+                {
+                    id: 3,
+                    name: "Queen Size Bed",
+                    roomId: 2,
+                    category: "furniture",
+                    purchaseDate: "2023-01-10",
+                    purchasePrice: 850.00,
+                    currentValue: 800.00,
+                    condition: "new",
+                    description: "Memory foam mattress with bed frame",
+                    photo: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    receipt: "receipt.pdf",
+                    serialNumber: "",
+                    notes: "Purchased from Mattress Firm"
+                },
+                {
+                    id: 4,
+                    name: "Refrigerator",
+                    roomId: 3,
+                    category: "appliances",
+                    purchaseDate: "2020-05-15",
+                    purchasePrice: 1100.00,
+                    currentValue: 700.00,
+                    condition: "good",
+                    description: "Stainless steel French door refrigerator",
+                    photo: "https://images.unsplash.com/photo-1571175443880-49e1d1b5d50b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    receipt: "",
+                    serialNumber: "SN-FRIDGE-456789",
+                    notes: "Energy Star rated"
+                },
+                {
+                    id: 5,
+                    name: "Diamond Engagement Ring",
+                    roomId: 2,
+                    category: "jewelry",
+                    purchaseDate: "2019-12-24",
+                    purchasePrice: 3500.00,
+                    currentValue: 4200.00,
+                    condition: "excellent",
+                    description: "1.5 carat diamond in platinum setting",
+                    photo: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
+                    receipt: "receipt.pdf",
+                    serialNumber: "GIA-789456123",
+                    notes: "Appraised value $4,200. Keep in safe."
+                }
+            ];
+            
+            // Add sample items
+            sampleItems.forEach(item => {
+                inventoryData.items.push(item);
+                
+                // Update room stats
+                const room = inventoryData.rooms.find(r => r.id === item.roomId);
+                if (room) {
+                    room.itemCount += 1;
+                    room.totalValue += item.currentValue;
+                }
+            });
+            
+            // Update next item ID
+            inventoryData.nextItemId = sampleItems.length + 1;
+            
+            // Save and update UI
+            saveData();
+            updateStatistics();
+            renderRooms();
+            
+            console.log('Sample data added');
+        }
+        
+        // Uncomment to add sample data automatically
+        // setTimeout(addSampleData, 1000);
+        
+        // Add sample data button (for demo purposes)
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Shift+S to add sample data
+            if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+                addSampleData();
+                showToast('Sample data added', 'success');
+            }
+        });
+    </script>
+</body>
+</html>
