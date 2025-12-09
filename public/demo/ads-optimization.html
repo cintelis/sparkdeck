@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Ads Optimization Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4285f4;
+            --primary-dark: #3367d6;
+            --success: #0f9d58;
+            --warning: #f4b400;
+            --danger: #db4437;
+            --light: #f8f9fa;
+            --dark: #202124;
+            --gray: #5f6368;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .account-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        select {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: 1px solid #dadce0;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: #f0f7ff;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .positive {
+            color: var(--success);
+        }
+
+        .negative {
+            color: var(--danger);
+        }
+
+        .campaign-table {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray);
+            border-bottom: 1px solid #eee;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status.active {
+            background-color: #e6f4ea;
+            color: var(--success);
+        }
+
+        .status.paused {
+            background-color: #fce8e6;
+            color: var(--danger);
+        }
+
+        .status.ended {
+            background-color: #f1f3f4;
+            color: var(--gray);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .budget-low {
+            background-color: var(--danger);
+        }
+
+        .budget-medium {
+            background-color: var(--warning);
+        }
+
+        .budget-good {
+            background-color: var(--success);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray);
+            margin: 0 5px;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .action-btn:hover {
+            color: var(--primary);
+        }
+
+        .recommendations {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .recommendation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .recommendation-item:last-child {
+            border-bottom: none;
+        }
+
+        .rec-info h4 {
+            margin-bottom: 5px;
+        }
+
+        .rec-info p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .rec-impact {
+            font-weight: 600;
+        }
+
+        .rec-impact.high {
+            color: var(--success);
+        }
+
+        .rec-impact.medium {
+            color: var(--warning);
+        }
+
+        .rec-impact.low {
+            color: var(--gray);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 4px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1001;
+        }
+
+        .notification.success {
+            background-color: var(--success);
+        }
+
+        .notification.error {
+            background-color: var(--danger);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 14px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .account-selector {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>Google Ads Optimizer</h1>
+            </div>
+            <div class="account-selector">
+                <div>
+                    <label for="account-select">Account:</label>
+                    <select id="account-select">
+                        <option value="1234567890">Main Account (1234567890)</option>
+                        <option value="2345678901">E-commerce Store (2345678901)</option>
+                        <option value="3456789012">Service Business (3456789012)</option>
+                    </select>
+                </div>
+                <button class="btn btn-outline" id="refresh-btn">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+                <button class="btn btn-primary" id="optimize-btn">
+                    <i class="fas fa-bolt"></i> Run Optimizations
+                </button>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-bullseye"></i>
+                        <span>Click-Through Rate</span>
+                    </div>
+                    <i class="fas fa-info-circle" style="color: #ccc;"></i>
+                </div>
+                <div class="stat-value" id="ctr-value">4.2%</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0.3% from last week</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Cost Per Conversion</span>
+                    </div>
+                    <i class="fas fa-info-circle" style="color: #ccc;"></i>
+                </div>
+                <div class="stat-value" id="cpc-value">$18.50</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-$2.10 from last week</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-concierge-bell"></i>
+                        <span>Conversions</span>
+                    </div>
+                    <i class="fas fa-info-circle" style="color: #ccc;"></i>
+                </div>
+                <div class="stat-value" id="conv-value">142</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12% from last week</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Optimization Score</span>
+                    </div>
+                    <i class="fas fa-info-circle" style="color: #ccc;"></i>
+                </div>
+                <div class="stat-value" id="score-value">78%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill budget-good" style="width: 78%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="campaign-table">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-list"></i>
+                    <span>Campaign Performance</span>
+                </div>
+                <button class="btn btn-outline" id="add-campaign-btn">
+                    <i class="fas fa-plus"></i> Add Campaign
+                </button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campaign Name</th>
+                        <th>Status</th>
+                        <th>Clicks</th>
+                        <th>Impressions</th>
+                        <th>CTR</th>
+                        <th>Cost</th>
+                        <th>Conversions</th>
+                        <th>Budget Usage</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="campaign-table-body">
+                    <!-- Campaign data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="recommendations">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-magic"></i>
+                    <span>Optimization Recommendations</span>
+                </div>
+                <span class="btn-outline" style="padding: 5px 10px; border-radius: 4px;">5 recommendations</span>
+            </div>
+            <div id="recommendations-list">
+                <!-- Recommendations will be populated here -->
+            </div>
+        </div>
+
+        <div class="loading" id="loading-indicator">
+            <div class="spinner"></div>
+            <p>Fetching Google Ads data...</p>
+        </div>
+
+        <div id="notification" class="notification"></div>
+
+        <!-- Campaign Modal -->
+        <div class="modal" id="campaign-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title" id="modal-title">Create New Campaign</div>
+                    <button class="close-btn" id="close-modal-btn">&times;</button>
+                </div>
+                <form id="campaign-form">
+                    <div class="form-group">
+                        <label for="campaign-name">Campaign Name</label>
+                        <input type="text" id="campaign-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="campaign-type">Campaign Type</label>
+                        <select id="campaign-type" required>
+                            <option value="">Select type</option>
+                            <option value="search">Search Network</option>
+                            <option value="display">Display Network</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="video">Video</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="daily-budget">Daily Budget ($)</label>
+                        <input type="number" id="daily-budget" min="1" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bid-strategy">Bid Strategy</label>
+                        <select id="bid-strategy" required>
+                            <option value="tCPA">Target CPA</option>
+                            <option value="tROAS">Target ROAS</option>
+                            <option value="maxConv">Maximize Conversions</option>
+                            <option value="maxClicks">Maximize Clicks</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="campaign-notes">Notes (Optional)</label>
+                        <textarea id="campaign-notes" rows="3"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-outline" id="cancel-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="save-btn">Save Campaign</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Google Ads Optimization Dashboard Demo | This is a simulation for demonstration purposes only</p>
+        <p>In a real implementation, this would connect to the Google Ads API via a secure backend server</p>
+    </footer>
+
+    <script>
+        // Mock data for campaigns
+        const mockCampaigns = [
+            {
+                id: 1,
+                name: "Summer Sale - Search",
+                status: "active",
+                clicks: 1245,
+                impressions: 45890,
+                ctr: 2.71,
+                cost: 2450.50,
+                conversions: 89,
+                budget: 100,
+                spent: 78,
+                bidStrategy: "tCPA"
+            },
+            {
+                id: 2,
+                name: "Brand Awareness Display",
+                status: "active",
+                clicks: 5678,
+                impressions: 245000,
+                ctr: 2.32,
+                cost: 1200.75,
+                conversions: 34,
+                budget: 50,
+                spent: 45,
+                bidStrategy: "maxClicks"
+            },
+            {
+                id: 3,
+                name: "Product Launch 2024",
+                status: "paused",
+                clicks: 890,
+                impressions: 35600,
+                ctr: 2.50,
+                cost: 950.25,
+                conversions: 42,
+                budget: 75,
+                spent: 95,
+                bidStrategy: "tROAS"
+            },
+            {
+                id: 4,
+                name: "Remarketing - Abandoned Cart",
+                status: "active",
+                clicks: 345,
+                impressions: 12300,
+                ctr: 2.80,
+                cost: 450.80,
+                conversions: 28,
+                budget: 30,
+                spent: 29,
+                bidStrategy: "maxConv"
+            },
+            {
+                id: 5,
+                name: "Holiday Shopping Campaign",
+                status: "ended",
+                clicks: 5670,
+                impressions: 189000,
+                ctr: 3.00,
+                cost: 3400.00,
+                conversions: 156,
+                budget: 150,
+                spent: 150,
+                bidStrategy: "tCPA"
+            }
+        ];
+
+        // Mock recommendations
+        const mockRecommendations = [
+            {
+                id: 1,
+                title: "Increase budget for high-performing campaigns",
+                description: "Campaigns 'Summer Sale - Search' and 'Remarketing' are hitting budget limits daily.",
+                impact: "high",
+                affectedCampaigns: [1, 4]
+            },
+            {
+                id: 2,
+                title: "Add negative keywords",
+                description: "23 search terms are irrelevant and driving up costs without conversions.",
+                impact: "high",
+                affectedCampaigns: [1]
+            },
+            {
+                id: 3,
+                title: "Update ad copy for better CTR",
+                description: "3 ads have CTR below 1%. Test new ad variations.",
+                impact: "medium",
+                affectedCampaigns: [2]
+            },
+            {
+                id: 4,
+                title: "Adjust bids for low-performing keywords",
+                description: "45 keywords have cost/conversion above $50. Consider lowering bids.",
+                impact: "medium",
+                affectedCampaigns: [1, 3]
+            },
+            {
+                id: 5,
+                title: "Expand location targeting",
+                description: "Campaign 'Brand Awareness' is performing well in 3 cities. Consider expanding to similar markets.",
+                impact: "low",
+                affectedCampaigns: [2]
+            }
+        ];
+
+        // DOM elements
+        const campaignTableBody = document.getElementById('campaign-table-body');
+        const recommendationsList = document.getElementById('recommendations-list');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const optimizeBtn = document.getElementById('optimize-btn');
+        const addCampaignBtn = document.getElementById('add-campaign-btn');
+        const campaignModal = document.getElementById('campaign-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const campaignForm = document.getElementById('campaign-form');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const notification = document.getElementById('notification');
+        const accountSelect = document.getElementById('account-select');
+
+        // Initialize the dashboard
+        function initDashboard() {
+            renderCampaignTable();
+            renderRecommendations();
+            updateStats();
+        }
+
+        // Render campaign table
+        function renderCampaignTable() {
+            campaignTableBody.innerHTML = '';
+            
+            mockCampaigns.forEach(campaign => {
+                const budgetPercentage = (campaign.spent / campaign.budget) * 100;
+                let budgetClass = 'budget-good';
+                
+                if (budgetPercentage > 90) budgetClass = 'budget-low';
+                else if (budgetPercentage > 70) budgetClass = 'budget-medium';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${campaign.name}</td>
+                    <td><span class="status ${campaign.status}">${campaign.status.toUpperCase()}</span></td>
+                    <td>${campaign.clicks.toLocaleString()}</td>
+                    <td>${campaign.impressions.toLocaleString()}</td>
+                    <td>${campaign.ctr.toFixed(2)}%</td>
+                    <td>$${campaign.cost.toFixed(2)}</td>
+                    <td>${campaign.conversions}</td>
+                    <td>
+                        <div>$${campaign.spent.toFixed(2)} / $${campaign.budget.toFixed(2)}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${budgetClass}" style="width: ${Math.min(budgetPercentage, 100)}%"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="action-btn" onclick="toggleCampaignStatus(${campaign.id})" title="${campaign.status === 'active' ? 'Pause' : 'Enable'}">
+                            <i class="fas fa-${campaign.status === 'active' ? 'pause' : 'play'}"></i>
+                        </button>
+                        <button class="action-btn" onclick="editCampaign(${campaign.id})" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" onclick="showCampaignDetails(${campaign.id})" title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                campaignTableBody.appendChild(row);
+            });
+        }
+
+        // Render recommendations
+        function renderRecommendations() {
+            recommendationsList.innerHTML = '';
+            
+            mockRecommendations.forEach(rec => {
+                const recElement = document.createElement('div');
+                recElement.className = 'recommendation-item';
+                recElement.innerHTML = `
+                    <div class="rec-info">
+                        <h4>${rec.title}</h4>
+                        <p>${rec.description}</p>
+                    </div>
+                    <div>
+                        <span class="rec-impact ${rec.impact}">${rec.impact.toUpperCase()} IMPACT</span>
+                        <button class="btn btn-primary" style="margin-left: 10px; padding: 8px 15px;" onclick="applyRecommendation(${rec.id})">Apply</button>
+                    </div>
+                `;
+                recommendationsList.appendChild(recElement);
+            });
+        }
+
+        // Update stats with random variations (simulating live data)
+        function updateStats() {
+            // Simulate small random changes to stats
+            const ctrValue = document.getElementById('ctr-value');
+            const currentCTR = parseFloat(ctrValue.textContent.replace('%', ''));
+            const newCTR = (currentCTR + (Math.random() * 0.4 - 0.2)).toFixed(2);
+            ctrValue.textContent = `${newCTR}%`;
+            
+            const cpcValue = document.getElementById('cpc-value');
+            const currentCPC = parseFloat(cpcValue.textContent.replace('$', ''));
+            const newCPC = (currentCPC + (Math.random() * 1 - 0.5)).toFixed(2);
+            cpcValue.textContent = `$${newCPC}`;
+            
+            const convValue = document.getElementById('conv-value');
+            const currentConv = parseInt(convValue.textContent);
+            const change = Math.floor(Math.random() * 10) - 3;
+            const newConv = Math.max(0, currentConv + change);
+            convValue.textContent = newConv;
+            
+            // Update change indicators
+            const ctrChange = document.querySelector('#ctr-value').parentElement.querySelector('.stat-change');
+            const cpcChange = document.querySelector('#cpc-value').parentElement.querySelector('.stat-change');
+            
+            // Randomize change indicators
+            if (Math.random() > 0.5) {
+                ctrChange.className = 'stat-change positive';
+                ctrChange.innerHTML = '<i class="fas fa-arrow-up"></i><span>+' + (Math.random() * 0.5).toFixed(2) + '% from last week</span>';
+            } else {
+                ctrChange.className = 'stat-change negative';
+                ctrChange.innerHTML = '<i class="fas fa-arrow-down"></i><span>-' + (Math.random() * 0.3).toFixed(2) + '% from last week</span>';
+            }
+            
+            if (Math.random() > 0.5) {
+                cpcChange.className = 'stat-change negative';
+                cpcChange.innerHTML = '<i class="fas fa-arrow-down"></i><span>-$' + (Math.random() * 3).toFixed(2) + ' from last week</span>';
+            } else {
+                cpcChange.className = 'stat-change positive';
+                cpcChange.innerHTML = '<i class="fas fa-arrow-up"></i><span>+$' + (Math.random() * 2).toFixed(2) + ' from last week</span>';
+            }
+        }
+
+        // Show loading indicator
+        function showLoading() {
+            loadingIndicator.style.display = 'block';
+        }
+
+        // Hide loading indicator
+        function hideLoading() {
+            loadingIndicator.style.display = 'none';
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Simulate API call to Google Ads
+        function simulateAPICall() {
+            showLoading();
+            
+            // Simulate API delay
+            setTimeout(() => {
+                // Update data with random variations
+                updateStats();
+                
+                // Simulate updating campaigns with small random changes
+                mockCampaigns.forEach(campaign => {
+                    if (campaign.status === 'active') {
+                        // Add some random activity to active campaigns
+                        const clickChange = Math.floor(Math.random() * 50);
+                        const convChange = Math.floor(Math.random() * 5);
+                        
+                        campaign.clicks += clickChange;
+                        campaign.conversions += convChange;
+                        campaign.cost += clickChange * 0.5;
+                        campaign.spent = Math.min(campaign.spent + (Math.random() * 3), campaign.budget);
+                    }
+                });
+                
+                renderCampaignTable();
+                hideLoading();
+                showNotification('Google Ads data refreshed successfully!');
+            }, 1500);
+        }
+
+        // Toggle campaign status (active/paused)
+        function toggleCampaignStatus(campaignId) {
+            const campaign = mockCampaigns.find(c => c.id === campaignId);
+            if (campaign) {
+                campaign.status = campaign.status === 'active' ? 'paused' : 'active';
+                renderCampaignTable();
+                showNotification(`Campaign "${campaign.name}" ${campaign.status === 'active' ? 'enabled' : 'paused'}`);
+            }
+        }
+
+        // Edit campaign
+        function editCampaign(campaignId) {
+            const campaign = mockCampaigns.find(c => c.id === campaignId);
+            if (campaign) {
+                document.getElementById('modal-title').textContent = 'Edit Campaign';
+                document.getElementById('campaign-name').value = campaign.name;
+                document.getElementById('campaign-type').value = 'search';
+                document.getElementById('daily-budget').value = campaign.budget;
+                document.getElementById('bid-strategy').value = campaign.bidStrategy;
+                document.getElementById('campaign-notes').value = 'Editing existing campaign';
+                
+                // Set a custom attribute to track which campaign we're editing
+                campaignForm.dataset.editingId = campaignId;
+                
+                campaignModal.style.display = 'flex';
+            }
+        }
+
+        // Show campaign details
+        function showCampaignDetails(campaignId) {
+            const campaign = mockCampaigns.find(c => c.id === campaignId);
+            if (campaign) {
+                alert(`Campaign Details:\n\nName: ${campaign.name}\nStatus: ${campaign.status}\nClicks: ${campaign.clicks}\nImpressions: ${campaign.impressions}\nCTR: ${campaign.ctr}%\nCost: $${campaign.cost.toFixed(2)}\nConversions: ${campaign.conversions}\nBudget: $${campaign.budget}/day\nBid Strategy: ${campaign.bidStrategy}`);
+            }
+        }
+
+        // Apply a recommendation
+        function applyRecommendation(recommendationId) {
+            const rec = mockRecommendations.find(r => r.id === recommendationId);
+            if (rec) {
+                showLoading();
+                
+                // Simulate API processing
+                setTimeout(() => {
+                    // In a real app, this would call the Google Ads API to apply changes
+                    hideLoading();
+                    showNotification(`Applied recommendation: "${rec.title}"`);
+                    
+                    // Remove the recommendation from the list
+                    const index = mockRecommendations.findIndex(r => r.id === recommendationId);
+                    if (index !== -1) {
+                        mockRecommendations.splice(index, 1);
+                        renderRecommendations();
+                    }
+                }, 1000);
+            }
+        }
+
+        // Run optimizations
+        function runOptimizations() {
+            showLoading();
+            
+            // Simulate optimization process
+            setTimeout(() => {
+                // Apply some random optimizations to campaigns
+                mockCampaigns.forEach(campaign => {
+                    if (campaign.status === 'active') {
+                        // Simulate CTR improvement
+                        campaign.ctr += 0.1;
+                        
+                        // Simulate cost reduction
+                        campaign.cost *= 0.97;
+                        
+                        // Simulate conversion increase
+                        campaign.conversions = Math.floor(campaign.conversions * 1.05);
+                    }
+                });
+                
+                // Update optimization score
+                const scoreElement = document.getElementById('score-value');
+                let currentScore = parseInt(scoreElement.textContent.replace('%', ''));
+                currentScore = Math.min(100, currentScore + Math.floor(Math.random() * 5) + 1);
+                scoreElement.textContent = `${currentScore}%`;
+                
+                // Update progress bar
+                const progressFill = document.querySelector('#score-value').parentElement.querySelector('.progress-fill');
+                progressFill.style.width = `${currentScore}%`;
+                
+                renderCampaignTable();
+                hideLoading();
+                showNotification('Optimizations applied successfully! Optimization score improved.');
+            }, 2000);
+        }
+
+        // Event Listeners
+        refreshBtn.addEventListener('click', simulateAPICall);
+        
+        optimizeBtn.addEventListener('click', runOptimizations);
+        
+        addCampaignBtn.addEventListener('click', () => {
+            document.getElementById('modal-title').textContent = 'Create New Campaign';
+            campaignForm.reset();
+            delete campaignForm.dataset.editingId;
+            campaignModal.style.display = 'flex';
+        });
+        
+        closeModalBtn.addEventListener('click', () => {
+            campaignModal.style.display = 'none';
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            campaignModal.style.display = 'none';
+        });
+        
+        // Handle form submission
+        campaignForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('campaign-name').value;
+            const budget = document.getElementById('daily-budget').value;
+            const bidStrategy = document.getElementById('bid-strategy').value;
+            
+            // Check if we're editing an existing campaign
+            const editingId = campaignForm.dataset.editingId;
+            
+            if (editingId) {
+                // Update existing campaign
+                const campaign = mockCampaigns.find(c => c.id === parseInt(editingId));
+                if (campaign) {
+                    campaign.name = name;
+                    campaign.budget = parseFloat(budget);
+                    campaign.bidStrategy = bidStrategy;
+                    showNotification(`Campaign "${name}" updated successfully!`);
+                }
+            } else {
+                // Add new campaign
+                const newCampaign = {
+                    id: mockCampaigns.length + 1,
+                    name: name,
+                    status: 'active',
+                    clicks: 0,
+                    impressions: 0,
+                    ctr: 0,
+                    cost: 0,
+                    conversions: 0,
+                    budget: parseFloat(budget),
+                    spent: 0,
+                    bidStrategy: bidStrategy
+                };
+                
+                mockCampaigns.unshift(newCampaign);
+                showNotification(`New campaign "${name}" created successfully!`);
+            }
+            
+            renderCampaignTable();
+            campaignModal.style.display = 'none';
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === campaignModal) {
+                campaignModal.style.display = 'none';
+            }
+        });
+        
+        // Simulate account change
+        accountSelect.addEventListener('change', () => {
+            showLoading();
+            
+            // Simulate loading data for a different account
+            setTimeout(() => {
+                // In a real app, this would fetch data for the selected account
+                initDashboard();
+                hideLoading();
+                showNotification(`Switched to account: ${accountSelect.options[accountSelect.selectedIndex].text}`);
+            }, 1000);
+        });
+
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', initDashboard);
+
+        // Make functions available globally for onclick handlers
+        window.toggleCampaignStatus = toggleCampaignStatus;
+        window.editCampaign = editCampaign;
+        window.showCampaignDetails = showCampaignDetails;
+        window.applyRecommendation = applyRecommendation;
+    </script>
+</body>
+</html>
