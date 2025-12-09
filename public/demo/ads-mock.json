@@ -1,0 +1,59 @@
+{
+  "campaigns": [
+    {
+      "id": 1,
+      "name": "Summer Sale - Search",
+      "status": "active",
+      "clicks": 1245,
+      "impressions": 45890,
+      "ctr": 2.71,
+      "cost": 2450.50,
+      "conversions": 89,
+      "budget": 100,
+      "spent": 78,
+      "bidStrategy": "tCPA"
+    },
+    {
+      "id": 2,
+      "name": "Brand Awareness Display",
+      "status": "active",
+      "clicks": 5678,
+      "impressions": 245000,
+      "ctr": 2.32,
+      "cost": 1200.75,
+      "conversions": 34,
+      "budget": 50,
+      "spent": 45,
+      "bidStrategy": "maxClicks"
+    },
+    {
+      "id": 3,
+      "name": "Product Launch 2024",
+      "status": "paused",
+      "clicks": 890,
+      "impressions": 35600,
+      "ctr": 2.50,
+      "cost": 950.25,
+      "conversions": 42,
+      "budget": 75,
+      "spent": 95,
+      "bidStrategy": "tROAS"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": 1,
+      "title": "Increase budget for high-performing campaigns",
+      "description": "Campaigns 'Summer Sale - Search' and 'Remarketing' are hitting budget limits daily.",
+      "impact": "high",
+      "affectedCampaigns": [1]
+    },
+    {
+      "id": 2,
+      "title": "Add negative keywords",
+      "description": "23 search terms are irrelevant and driving up costs without conversions.",
+      "impact": "high",
+      "affectedCampaigns": [1]
+    }
+  ]
+}

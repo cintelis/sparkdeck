@@ -48,6 +48,17 @@ app.get('/api/ideas', (req, res) => {
   res.json(ideas);
 });
 
+// Demo API for ads optimization demo
+app.get('/api/demo/ads', (req, res) => {
+  try {
+    const mock = require(path.join(__dirname, 'public', 'demo', 'ads-mock.json'));
+    res.json(mock);
+  } catch (err) {
+    console.error('Failed to load ads mock:', err);
+    res.status(500).json({ error: 'Failed to load demo data' });
+  }
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ 

@@ -69,11 +69,35 @@
       "createdAt": "2024-01-05",
       "updatedAt": "2024-01-12"
     }
+    ,
+    {
+      "id": 4,
+      "title": "Google Ads Optimizer",
+      "subtitle": "Automated campaign optimization powered by data and heuristics",
+      "category": "saas",
+      "complexity": 3,
+      "rating": 4.48,
+      "description": "A tool that analyzes Google Ads campaigns and applies automated optimizations to improve CPA and ROAS using historical performance and machine-driven recommendations.",
+      "features": [
+        "Automated bid adjustments",
+        "Ad copy A/B suggestions",
+        "Budget reallocation recommendations",
+        "Performance anomaly alerts"
+      ],
+      "problem": "Advertisers spend time manually tuning campaigns and often miss signals that hurt performance.",
+      "solution": "Provide automated, explainable optimizations that reduce manual work and improve campaign outcomes.",
+      "tags": ["Ads", "Marketing", "SaaS", "Automation"],
+      "demoUrl": "/demo/ads-optimization.html",
+      "color": "#3b82f6",
+      "icon": "fas fa-chart-line",
+      "createdAt": "2025-12-09",
+      "updatedAt": "2025-12-09"
+    }
   ],
   "stats": {
-    "totalIdeas": 3,
+    "totalIdeas": 4,
     "categories": ["saas", "tech"],
-    "averageRating": 4.5,
-    "lastUpdated": "2024-01-20T10:30:00Z"
+    "averageRating": 4.48,
+    "lastUpdated": "2025-12-09T00:00:00Z"
   }
 }

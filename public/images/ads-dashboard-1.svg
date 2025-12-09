@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet">
+  <rect width="100%" height="100%" fill="#f8fafc"/>
+  <rect x="24" y="24" rx="12" ry="12" width="752" height="120" fill="#ffffff" stroke="#e6eef8"/>
+  <text x="48" y="72" font-family="Segoe UI, Roboto, Arial" font-size="18" fill="#1f2937">Dashboard Mock — Top KPIs</text>
+  <g transform="translate(48,120)">
+    <rect x="0" y="12" width="200" height="80" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <rect x="220" y="12" width="200" height="80" rx="8" fill="#ecfdf5" stroke="#bbf7d0"/>
+    <rect x="440" y="12" width="200" height="80" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+    <text x="12" y="55" font-family="Segoe UI, Roboto, Arial" font-size="16" fill="#0f172a">KPI: CTR 4.2%</text>
+  </g>
+  <text x="48" y="420" font-family="Segoe UI, Roboto, Arial" font-size="12" fill="#6b7280">Placeholder image — replace with screenshots</text>
+</svg>

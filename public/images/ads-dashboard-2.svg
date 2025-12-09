@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <rect x="24" y="24" rx="12" ry="12" width="752" height="380" fill="#0f172a" opacity="0.03"/>
+  <g transform="translate(48,48)">
+    <rect x="0" y="0" width="320" height="220" rx="10" fill="#fff" stroke="#e6eef8"/>
+    <rect x="340" y="0" width="320" height="220" rx="10" fill="#fff" stroke="#e6eef8"/>
+    <text x="12" y="24" font-family="Segoe UI, Roboto, Arial" font-size="16" fill="#0f172a">Recommendations Mock</text>
+    <line x1="12" y1="48" x2="300" y2="48" stroke="#eef2ff" stroke-width="2"/>
+  </g>
+  <text x="48" y="440" font-family="Segoe UI, Roboto, Arial" font-size="12" fill="#9ca3af">Placeholder image — replace with screenshots</text>
+</svg>

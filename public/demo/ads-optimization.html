@@ -623,14 +623,26 @@
         </div>
     </div>
 
+    <section class="demo-section" style="max-width:980px;margin:28px auto;">
+        <h2 style="margin-bottom:12px;">Mock UI Preview</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;align-items:center;">
+            <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid #eef2f7;display:flex;align-items:center;justify-content:center;">
+                <img src="/images/ads-dashboard-1.svg" alt="Dashboard mock" style="max-width:100%;height:160px;object-fit:contain;">
+            </div>
+            <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid #eef2f7;display:flex;align-items:center;justify-content:center;">
+                <img src="/images/ads-dashboard-2.svg" alt="Recommendations mock" style="max-width:100%;height:160px;object-fit:contain;">
+            </div>
+        </div>
+    </section>
+
     <footer>
         <p>Google Ads Optimization Dashboard Demo | This is a simulation for demonstration purposes only</p>
         <p>In a real implementation, this would connect to the Google Ads API via a secure backend server</p>
     </footer>
 
     <script>
-        // Mock data for campaigns
-        const mockCampaigns = [
+        // Mock data for campaigns (mutable — may be overwritten by server demo API)
+        let mockCampaigns = [
             {
                 id: 1,
                 name: "Summer Sale - Search",
@@ -698,8 +710,8 @@
             }
         ];
 
-        // Mock recommendations
-        const mockRecommendations = [
+        // Mock recommendations (mutable — may be overwritten by server demo API)
+        let mockRecommendations = [
             {
                 id: 1,
                 title: "Increase budget for high-performing campaigns",
@@ -751,8 +763,24 @@
         const notification = document.getElementById('notification');
         const accountSelect = document.getElementById('account-select');
 
-        // Initialize the dashboard
-        function initDashboard() {
+        // Fetch demo data from server (if available) and initialize the dashboard
+        async function loadDemoData() {
+            try {
+                const resp = await fetch('/api/demo/ads');
+                if (resp.ok) {
+                    const json = await resp.json();
+                    if (json.campaigns && Array.isArray(json.campaigns)) mockCampaigns = json.campaigns;
+                    if (json.recommendations && Array.isArray(json.recommendations)) mockRecommendations = json.recommendations;
+                } else {
+                    console.warn('Demo API returned non-OK status:', resp.status);
+                }
+            } catch (err) {
+                console.warn('Failed to fetch demo data, using local mocks:', err);
+            }
+        }
+
+        async function initDashboard() {
+            await loadDemoData();
             renderCampaignTable();
             renderRecommendations();
             updateStats();
